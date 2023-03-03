@@ -1,7 +1,7 @@
 # 1. 프로그램 설치 및 환경 설정
 
 - 프로그램 동작 환경 및 개발 환경
-	- Simulator : Windows 11
+	- Simulator : **Morai Sumulator** on Windows 11
 	- Dev tool : **Ubuntu 18.04** , **VS Code** on Virtual Box VM env.
 	- Language  & Library : Python 3.7, opencv
 
