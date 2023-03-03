@@ -6,18 +6,18 @@
 
 - `시작 매뉴` → `하드 디스크 파티션 만들기 및 포맷` 실행
     
-    ![Untitled](%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20481e908485c74bd1ac766589d4631d0e/Untitled.png)
+    ![Untitled](./README/Untitled.png)
     
 - ‘디스크 1’ 우클릭 → `속성` → `볼륨` → ‘파티션 형식’ 확인
     - GUID 파티션 테이블(GPT)
 - ‘Window10 (C:)’ 우클릭 → `볼륨 축소`
     - 축소할 공간 입력 : `61440` (60GB) → `축소`
     
-    ![Untitled](%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20481e908485c74bd1ac766589d4631d0e/Untitled%201.png)
+    ![Untitled](./README/Untitled%201.png)
     
 - 200 GB의 ‘할당되지 않음’ 디스크 생성
     
-    ![Untitled](%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20481e908485c74bd1ac766589d4631d0e/Untitled%202.png)
+    ![Untitled](./README/Untitled%202.png)
     
 
 ### Ubuntu 다운로드
@@ -37,7 +37,7 @@
     
 - Rufus 실행
     
-    ![Untitled](%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20481e908485c74bd1ac766589d4631d0e/Untitled%203.png)
+    ![Untitled](./README/Untitled%203.png)
     
     - 장치 : `BOOT (E:) 16GB`
     - 부트 유형 : `ubuntu-18.04.6-desktop-amd64.iso`
@@ -50,7 +50,7 @@
 
 - `시작 매뉴` → `제어판` → `하드웨어 및 소리` → `전원 옵션` → `전원 단추 작동 설정`
     
-    ![Untitled](%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20481e908485c74bd1ac766589d4631d0e/Untitled%204.png)
+    ![Untitled](./README/Untitled%204.png)
     
 - `현재 사용할 수 없는 설정 변경` 클릭 → `빠른 시작 켜기(권장)` 체크 해제 → `변경 내용 저장`
 
@@ -82,7 +82,7 @@
 - `설정` → `지역 및 언어` → `설치된 언어 관리`
     - 키보드 입력기 : `fcitx`
     
-    ![스크린샷, 2023-02-24 11-56-36.png](%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20481e908485c74bd1ac766589d4631d0e/%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-02-24_11-56-36.png)
+    ![스크린샷, 2023-02-24 11-56-36.png](./README/%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-02-24_11-56-36.png)
     
 - `shift` + `space` 또는 `한/영`으로 언어 전환 가능
 
@@ -272,15 +272,15 @@
 
 - `Edit` → `Network Settings`
     
-    ![스크린샷, 2023-02-28 10-23-24.png](%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20481e908485c74bd1ac766589d4631d0e/%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-02-28_10-23-24.png)
+    ![스크린샷, 2023-02-28 10-23-24.png](./README/%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7_2023-02-28_10-23-24.png)
     
 - Cmd Control 설정
     - `MoraiCmdController` `ROS`
     - `Connect` 버튼 누르고 Status: Connected 확인
     
-    ![Untitled](%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20481e908485c74bd1ac766589d4631d0e/Untitled%205.png)
+    ![Untitled](./README/Untitled%205.png)
     
 - Publisher, Subscriber, Service 설정
     - `Ros`
     
-    ![Untitled](%E1%84%92%E1%85%AA%E1%86%AB%E1%84%80%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20481e908485c74bd1ac766589d4631d0e/Untitled%206.png)
+    ![Untitled](./README/Untitled%206.png)
