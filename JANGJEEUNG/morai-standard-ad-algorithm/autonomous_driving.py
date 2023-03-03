@@ -1,20 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from .perception.forward_object_detector import ForwardObjectDetector
-from .localization.path_manager import PathManager
-from .planning.adaptive_cruise_control import AdaptiveCruiseControl
-from .control.pure_pursuit import PurePursuit
-from .control.pid import Pid
-from .control.control_input import ControlInput
-from .config.config import Config
+import numpy as np
+import matplotlib.pyplot as plt
+from perception.forward_object_detector import ForwardObjectDetector
+from localization.path_manager import PathManager
+from planning.adaptive_cruise_control import AdaptiveCruiseControl
+from control.pure_pursuit import PurePursuit
+from control.pid import Pid
+from control.control_input import ControlInput
+from config.config import Config
 
-from .mgeo.calc_mgeo_path import mgeo_dijkstra_path
+from mgeo.calc_mgeo_path import mgeo_dijkstra_path
 
 
 
 class AutonomousDriving:
     def __init__(self):
+        
         config = Config()
+        config.update_config("config/config.json")
 
         if config["map"]["use_mgeo_path"]:
             mgeo_path = mgeo_dijkstra_path(config["map"]["name"])
@@ -29,7 +33,7 @@ class AutonomousDriving:
             )
         self.path_manager.set_velocity_profile(**config['planning']['velocity_profile'])
 
-        self.forward_object_detector = ForwardObjectDetector(config["map"]["traffic_light_list"])
+        # self.forward_object_detector = ForwardObjectDetector(config["map"]["traffic_light_list"])
 
         self.adaptive_cruise_control = AdaptiveCruiseControl(
             vehicle_length=config['common']['vehicle_length'], **config['planning']['adaptive_cruise_control']
@@ -61,3 +65,32 @@ class AutonomousDriving:
         steering_cmd = self.pure_pursuit.calculate_steering_angle()
 
         return ControlInput(acc_cmd, steering_cmd), local_path
+
+if __name__  =="__main__":
+    ad = AutonomousDriving()
+    # print(dir(ad))
+    li = [
+        # ad.adaptive_cruise_control,
+        #   ad.forward_object_detector,
+          ad.path,
+        #   ad.path_manager,
+        #   ad.pid,
+        #   ad.pure_pursuit
+        ]
+    
+    class Point:
+        def __init__(self, arr) -> None:
+            self.x = arr[0]
+            self.y = arr[1]
+        
+    a = []    
+    for l in li:
+        a.append(l)
+        
+    li = []
+    for i in range(len(a[0])):
+        li.append([a[0][i].x, a[0][i].y])
+        
+    np_li = np.array(li)
+    plt.scatter(*np_li.T)
+    plt.show()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import numpy as np
-from ..localization.point import Point
+from localization.point import Point
 
 
 class ForwardObjectDetector(object):

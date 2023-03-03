@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from .localization.point import Point
+from localization.point import Point
 
 
 class VehicleState:

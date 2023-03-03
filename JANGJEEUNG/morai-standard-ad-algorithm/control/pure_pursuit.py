@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from ..vehicle_state import VehicleState
+from vehicle_state import VehicleState
 import numpy as np
 
 

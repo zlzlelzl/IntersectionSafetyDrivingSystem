@@ -76,11 +76,11 @@ class IntersectionController(object): # super method의 argument로 전달되려
         obj.TL = signal_id_list
 
         """STEP #3 인스턴스 메소드 호출해서 설정할 값들 설정하기"""       
-        if light_set is not None:
-            for synced_signal_list in signal_id_list:
-                for synced_signal_id in synced_signal_list :
-                    if synced_signal_id in light_set.signals :
-                        obj.TL_dict[synced_signal_id] = light_set.signals[synced_signal_id]
+        # if light_set is not None:
+        #     for synced_signal_list in signal_id_list:
+        #         for synced_signal_id in synced_signal_list :
+        #             if synced_signal_id in light_set.signals :
+        #                 obj.TL_dict[synced_signal_id] = light_set.signals[synced_signal_id]
 
         keys = list(obj.TL_dict.keys())
         if len(keys) > 0 :

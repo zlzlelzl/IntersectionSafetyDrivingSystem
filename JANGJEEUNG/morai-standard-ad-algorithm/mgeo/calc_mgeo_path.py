@@ -8,12 +8,12 @@ import io
 import os
 import sys
 
-from ..localization.point import Point
-from .lib.mgeo.class_defs import *
+from localization.point import Point
+# from .lib.mgeo.class_defs import *
 from .e_dijkstra import Dijkstra
+from .lib.mgeo.class_defs.mgeo_planner_map import *
 
-
-class mgeo_dijkstra_path :
+class mgeo_dijkstra_path:
     def __init__(self, map_name):
 
         current_path = os.path.dirname(os.path.realpath(__file__))
