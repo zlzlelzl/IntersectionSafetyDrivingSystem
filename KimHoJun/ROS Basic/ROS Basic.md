@@ -527,7 +527,7 @@ ld : 전방 주시 거리
 
 ![img27](https://user-images.githubusercontent.com/104968672/223345819-1a9a6634-718b-4bb7-9933-5a147fd1bcc2.png)
 
-- Dsafe (안전 거리)는 현재 속도에서 time gap의 거리와 defaultSpace를 더한 값
+- D safe (안전 거리)는 현재 속도에서 time gap의 거리와 defaultSpace를 더한 값
 
 - deaflutSpace는 기본 유지 거리이고, time gap은 판단에서 제어까지 차량을 안전하게 멈추는 시간으로 보통 two-second-rule을 따라 2초로 함
 
