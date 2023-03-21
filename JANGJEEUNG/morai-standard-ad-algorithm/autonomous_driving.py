@@ -191,11 +191,17 @@ np_surface_marking_set = np.array(point_surface_marking_set)
 # plt.scatter(*np_link.T, c="green", label="link")
 # plt.scatter(*np_node.T, c="blue", label="node")
 
-plt.scatter(*np_lane_boundary_set.T, c="yellow", label="boundary")
-# plt.scatter(*np_lane_node_set.T, c="red", label="lane_node")
+# %%
 
-plt.scatter(*np_singlecrosswalk_set.T, c="black", label="crosswalk")
-# plt.scatter(*np_surface_marking_set.T, c="black", label="surface")
+plt.xlim([50,200])
+plt.ylim([1400,1600])
+
+
+# plt.scatter(*np_lane_boundary_set.T, c="black", s = 1, label="boundary")
+# plt.scatter(*np_lane_node_set.T, c="red",  s = 5, label="lane_node")
+
+# plt.scatter(*np_singlecrosswalk_set.T, c="blue",s = 20, label="crosswalk")
+# plt.scatter(*np_surface_marking_set.T, c="black", s = 1, label="marker")
 
 plt.legend(loc='best')
 plt.show()
