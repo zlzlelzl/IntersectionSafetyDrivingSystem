@@ -107,14 +107,43 @@ import json
 
 link_set = None
 node_set = None
-with open("mgeo/lib/mgeo_data/R_KR_PG_K-City/link_set.json", "r",encoding="utf-8" ) as f:
+lane_boundary_set = None
+lane_node_set = None
+singlecrosswalk_set = None
+surface_marking_set = None
+
+with open("json1/link_set.json", "r",encoding="utf-8" ) as f:
     link_set = json.load(f)
 
-with open("mgeo/lib/mgeo_data/R_KR_PG_K-City/node_set.json", "r",encoding="utf-8" ) as f:
+with open("json1/node_set.json", "r",encoding="utf-8" ) as f:
     node_set = json.load(f)
+    
+with open("json1/lane_boundary_set.json", "r",encoding="utf-8" ) as f:
+    lane_boundary_set = json.load(f)
+    
+with open("json1/lane_node_set.json", "r",encoding="utf-8" ) as f:
+    lane_node_set = json.load(f)
+    
+with open("json1/singlecrosswalk_set.json", "r",encoding="utf-8" ) as f:
+    singlecrosswalk_set = json.load(f)
+
+with open("json1/surface_marking_set.json", "r",encoding="utf-8" ) as f:
+    surface_marking_set = json.load(f)
+
+#%%
 
 # link_set의 포인트는 작은 흰점
 # node_set의 포인트는 큰 노란점
+
+point_singlecrosswalk_set = []
+point_surface_marking_set = []
+
+point_lane_boundary_set = []
+
+for i in range(len(lane_boundary_set)):
+    for j in range(len(lane_boundary_set[i])):
+        for k in range(len(lane_boundary_set[i]["points"])):
+            point_lane_boundary_set.append(lane_boundary_set[i]["points"][k][:2])
 
 point_link_set = []
 
@@ -122,6 +151,13 @@ for i in range(len(link_set)):
     for j in range(len(link_set[i])):
         for k in range(len(link_set[i]["points"])):
             point_link_set.append(link_set[i]["points"][k][:2])
+
+point_lane_node_set = []
+
+for i in range(len(lane_node_set)):
+    for j in range(len(lane_node_set[i])):
+            point_lane_node_set.append(lane_node_set[i]["point"][:2])
+
 
 point_node_set = []
 
@@ -131,10 +167,24 @@ for i in range(len(node_set)):
 
 np_link = np.array(point_link_set)
 np_node = np.array(point_node_set)
-    
-plt.scatter(*np_link.T, c="yellow")
-plt.scatter(*np_node.T, c="black")
-plt.scatter(*np_li.T, c ="blue")
+np_lane_boundary_set = np.array(point_lane_boundary_set)
+np_lane_node_set = np.array(point_lane_node_set)
+# np_singlecrosswalk_set = np.array(point_singlecrosswalk_set)
+# np_surface_marking_set = np.array(point_surface_marking_set)
+
+# plt.scatter(*np_li.T, c ="blue", label="route")
+
+plt.scatter(*np_lane_boundary_set.T, c="yellow", label="link")
+plt.scatter(*np_lane_node_set.T, c="black", label="node")
+
+plt.scatter(*np_link.T, c="blue", label="link")
+plt.scatter(*np_node.T, c="red", label="node")
+# plt.scatter(*np_li.T, c ="blue", label="route")
+# plt.scatter(*np_link.T, c="yellow", label="link")
+# plt.scatter(*np_node.T, c="black", label="node")
+
+
+plt.legend(loc='best')
 plt.show()
 
 #%%
