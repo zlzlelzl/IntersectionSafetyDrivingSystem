@@ -90,11 +90,11 @@ if 1:
     for l in li:
         a.append(l)
         
-    li = []
+    path = []
     for i in range(len(a[0])):
-        li.append([a[0][i].x, a[0][i].y])
+        path.append([a[0][i].x, a[0][i].y])
         
-    np_li = np.array(li)
+    np_path = np.array(path)
     
     # plt.show()
     
@@ -135,8 +135,22 @@ with open("json1/surface_marking_set.json", "r",encoding="utf-8" ) as f:
 # link_set의 포인트는 작은 흰점
 # node_set의 포인트는 큰 노란점
 
+# point_singlecrosswalk_set = []
+# point_surface_marking_set = []
+
 point_singlecrosswalk_set = []
+
+for i in range(len(singlecrosswalk_set)):
+    for j in range(len(singlecrosswalk_set[i])):
+        for k in range(len(singlecrosswalk_set[i]["points"])):
+            point_singlecrosswalk_set.append(singlecrosswalk_set[i]["points"][k][:2])
+
 point_surface_marking_set = []
+
+for i in range(len(surface_marking_set)):
+    for j in range(len(surface_marking_set[i])):
+        for k in range(len(surface_marking_set[i]["points"])):
+            point_surface_marking_set.append(surface_marking_set[i]["points"][k][:2])
 
 point_lane_boundary_set = []
 
@@ -169,20 +183,19 @@ np_link = np.array(point_link_set)
 np_node = np.array(point_node_set)
 np_lane_boundary_set = np.array(point_lane_boundary_set)
 np_lane_node_set = np.array(point_lane_node_set)
-# np_singlecrosswalk_set = np.array(point_singlecrosswalk_set)
-# np_surface_marking_set = np.array(point_surface_marking_set)
+np_singlecrosswalk_set = np.array(point_singlecrosswalk_set)
+np_surface_marking_set = np.array(point_surface_marking_set)
 
-# plt.scatter(*np_li.T, c ="blue", label="route")
+# plt.scatter(*np_path.T, c ="white", label="path")
 
-plt.scatter(*np_lane_boundary_set.T, c="yellow", label="link")
-plt.scatter(*np_lane_node_set.T, c="black", label="node")
+# plt.scatter(*np_link.T, c="green", label="link")
+# plt.scatter(*np_node.T, c="blue", label="node")
 
-plt.scatter(*np_link.T, c="blue", label="link")
-plt.scatter(*np_node.T, c="red", label="node")
-# plt.scatter(*np_li.T, c ="blue", label="route")
-# plt.scatter(*np_link.T, c="yellow", label="link")
-# plt.scatter(*np_node.T, c="black", label="node")
+plt.scatter(*np_lane_boundary_set.T, c="yellow", label="boundary")
+# plt.scatter(*np_lane_node_set.T, c="red", label="lane_node")
 
+plt.scatter(*np_singlecrosswalk_set.T, c="black", label="crosswalk")
+# plt.scatter(*np_surface_marking_set.T, c="black", label="surface")
 
 plt.legend(loc='best')
 plt.show()
