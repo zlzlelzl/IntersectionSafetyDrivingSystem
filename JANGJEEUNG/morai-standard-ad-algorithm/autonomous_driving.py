@@ -11,8 +11,18 @@ from control.pid import Pid
 from control.control_input import ControlInput
 from config.config import Config
 
-from mgeo.calc_mgeo_path import mgeo_dijkstra_path
+import numpy as np
+import matplotlib.pyplot as plt
+import json
 
+import matplotlib.patches as patches
+import matplotlib as mpl
+
+import rospy
+from morai_msgs.msg import EgoVehicleStatus
+
+
+from mgeo.calc_mgeo_path import mgeo_dijkstra_path
 
 
 class AutonomousDriving:
@@ -100,11 +110,6 @@ if 1:
     
     
 # 모든 노드와 링크를 캔버스에 나타내기
-
-import numpy as np
-import matplotlib.pyplot as plt
-import json
-
 link_set = None
 node_set = None
 lane_boundary_set = None
@@ -216,24 +221,63 @@ np_traffic_sign_set = np.array(point_traffic_sign_set)
 
 # plt.scatter(*np_path.T, c ="white", label="path")
 
-# plt.scatter(*np_link.T, c="green", label="link")
-# plt.scatter(*np_node.T, c="blue", label="node")
 
 # %%
 
-# 교차로 시작 북쪽
-# plt.xlim([120,160])
-# plt.ylim([1500,1525])
+def EgoStatus_callback(data):
+    rospy.loginfo(data.position.x)
+    rospy.loginfo(data.position.y)
+    rospy.loginfo(data.heading)
+    rospy.sleep(1)
+    raise Exception
 
-# 교차로 전체
-plt.xlim([50, 200])
-plt.ylim([1400, 1600])
+rospy.init_node('Ego_status_listener', anonymous=True)
+callback = rospy.Subscriber('/Ego_topic', EgoVehicleStatus, EgoStatus_callback)
+while not rospy.is_shutdown():
+    try:
+        pass
+    except:
+        break
+        
 
+
+#%%
+ego_size_x = 5
+ego_size_y = 1.5
+ego_x = 140.9760284423828
+ego_y = 1405.075439453125
+ego_angle = 97.4848403930664
+
+rec = patches.Rectangle((ego_x,ego_y), ego_size_x, ego_size_y, angle=ego_angle, color="red")
+plt.gca().add_patch(rec)
+
+# 차체 중심
+plt.xlim([ego_x - 50 , ego_x + 50])
+plt.ylim([ego_y - 50 , ego_y + 50])
+
+
+# # 교차로 시작 북쪽
+# plt.xlim([120, 160])
+# plt.ylim([1500, 1525])
+
+# # 교차로 전체
+# plt.xlim([50, 200])
+# plt.ylim([1300, 1700])
+
+# # 교차로 중심
+# plt.xlim([80, 180])
+# plt.ylim([1450, 1550])
+
+# 차선 바운더리
 plt.scatter(*np_lane_boundary_set.T, c="blue", s = 1, label="boundary")
-plt.scatter(*np_lane_node_set.T, c="red",  s = 5, label="lane_node")
+# plt.scatter(*np_lane_node_set.T, c="red", s = 5, label="lane_node")
 
-# 횡단 보도
-plt.scatter(*np_singlecrosswalk_set.T, c="red",s = 5, label="crosswalk")
+# # 차선 노드, 링크
+# plt.scatter(*np_link.T, c="green", s = 1, label="link" )
+# plt.scatter(*np_node.T, c="blue", s = 5, label="node")
+
+# # 횡단 보도
+# plt.scatter(*np_singlecrosswalk_set.T, c="red",s = 5, label="crosswalk")
 # # 도로 마커
 # plt.scatter(*np_surface_marking_set.T, c="black", s = 1, label="marker")
 
@@ -248,4 +292,5 @@ plt.scatter(*np_singlecrosswalk_set.T, c="red",s = 5, label="crosswalk")
 plt.legend(loc='best')
 plt.show()
 
-#%%
+
+# %%
