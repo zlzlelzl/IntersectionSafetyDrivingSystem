@@ -129,6 +129,14 @@ with open("json1/singlecrosswalk_set.json", "r",encoding="utf-8" ) as f:
 
 with open("json1/surface_marking_set.json", "r",encoding="utf-8" ) as f:
     surface_marking_set = json.load(f)
+    
+with open("json1/traffic_light_set.json", "r",encoding="utf-8" ) as f:
+    traffic_light_set = json.load(f)
+    
+with open("json1/traffic_sign_set.json", "r",encoding="utf-8" ) as f:
+    traffic_sign_set = json.load(f)
+
+
 
 #%%
 
@@ -137,6 +145,8 @@ with open("json1/surface_marking_set.json", "r",encoding="utf-8" ) as f:
 
 # point_singlecrosswalk_set = []
 # point_surface_marking_set = []
+
+## 링크 셋
 
 point_singlecrosswalk_set = []
 
@@ -166,12 +176,27 @@ for i in range(len(link_set)):
         for k in range(len(link_set[i]["points"])):
             point_link_set.append(link_set[i]["points"][k][:2])
 
+
+## 노드 셋
+
+point_traffic_light_set = []
+
+for i in range(len(traffic_light_set)):
+    for j in range(len(traffic_light_set[i])):
+            point_traffic_light_set.append(traffic_light_set[i]["point"][:2])
+            
+point_traffic_sign_set = []
+
+for i in range(len(traffic_sign_set)):
+    for j in range(len(traffic_sign_set[i])):
+            point_traffic_sign_set.append(traffic_sign_set[i]["point"][:2])
+
+
 point_lane_node_set = []
 
 for i in range(len(lane_node_set)):
     for j in range(len(lane_node_set[i])):
             point_lane_node_set.append(lane_node_set[i]["point"][:2])
-
 
 point_node_set = []
 
@@ -186,6 +211,9 @@ np_lane_node_set = np.array(point_lane_node_set)
 np_singlecrosswalk_set = np.array(point_singlecrosswalk_set)
 np_surface_marking_set = np.array(point_surface_marking_set)
 
+np_traffic_light_set = np.array(point_traffic_light_set)
+np_traffic_sign_set = np.array(point_traffic_sign_set)
+
 # plt.scatter(*np_path.T, c ="white", label="path")
 
 # plt.scatter(*np_link.T, c="green", label="link")
@@ -193,15 +221,29 @@ np_surface_marking_set = np.array(point_surface_marking_set)
 
 # %%
 
-plt.xlim([50,200])
-plt.ylim([1400,1600])
+# 교차로 시작 북쪽
+# plt.xlim([120,160])
+# plt.ylim([1500,1525])
 
+# 교차로 전체
+plt.xlim([50, 200])
+plt.ylim([1400, 1600])
 
-# plt.scatter(*np_lane_boundary_set.T, c="black", s = 1, label="boundary")
-# plt.scatter(*np_lane_node_set.T, c="red",  s = 5, label="lane_node")
+plt.scatter(*np_lane_boundary_set.T, c="blue", s = 1, label="boundary")
+plt.scatter(*np_lane_node_set.T, c="red",  s = 5, label="lane_node")
 
-# plt.scatter(*np_singlecrosswalk_set.T, c="blue",s = 20, label="crosswalk")
+# 횡단 보도
+plt.scatter(*np_singlecrosswalk_set.T, c="red",s = 5, label="crosswalk")
+# # 도로 마커
 # plt.scatter(*np_surface_marking_set.T, c="black", s = 1, label="marker")
+
+# # 신호(차로)
+# plt.scatter(*np_traffic_light_set.T, c="red", s = 2, label="crosswalk")
+# # 신호(횡단보도)
+# plt.scatter(*np_traffic_sign_set.T, c="black", s = 1, label="marker")
+
+
+
 
 plt.legend(loc='best')
 plt.show()
