@@ -61,8 +61,6 @@ class local_path_pub :
             # 점선은 525 정지선은 530
             if 530 in self.lanes[lane].lane_type:
                 self.stoplanes.append(lane)
-                
-        
         
         rate = rospy.Rate(20) # 20hz
         while not rospy.is_shutdown():
@@ -95,9 +93,6 @@ class local_path_pub :
                         tmp_pose.pose.orientation.w=1
                         self.local_path_msg.poses.append(tmp_pose)
 
-                velocity_msg = Float32()
-                velocity_msg = self.find_target_velocity()
-                
                 # print(x,y)
                 
                 # import json
@@ -108,26 +103,23 @@ class local_path_pub :
                 #     print("[{0},{1}]".format(pose.x, pose.y))
                 # print("]")
                     
-                # with open("temp_route.txt", "w") as f:
-                #     f.writelines()
-                # print(self.local_path_msg.poses)
                 #TODO: (7) Local Path 메세지 Publish
                 self.local_path_pub.publish(self.local_path_msg)
                 
-                is_stop_lane = False
                 # 특정 위치에 정지선이 있는 지 확인
-                for p in self.local_path_msg.poses:                    
-                    for stoplane in self.stoplanes:
-                        points = self.lanes[stoplane].points
-                        for point in points:
-                            x, y = point[0], point[1]
-                            distance=sqrt(pow(x-p.pose.position.x,2)+pow(y-p.pose.position.y,2))
-                            if distance < 0.5:
-                                is_stop_lane = True
-                                
+                is_stop_lane = self.find_stop_lane_in_local_path()
+                                                
                 print("is_stop_lane : ", is_stop_lane)
                 
-                self.velocity_pub.publish(velocity_msg)
+                # 정지선 우선 체크
+                # 곡률보다 감속하므로 lad를 현재 속도에 맞춰줌
+                if 0:
+                    pass
+                else:
+                    velocity_msg = Float32()
+                    velocity_msg = self.find_target_velocity()
+                    
+                    self.velocity_pub.publish(velocity_msg)
 
             rate.sleep()
 
@@ -140,7 +132,19 @@ class local_path_pub :
     def global_path_callback(self,msg):
         self.is_path = True
         self.global_path_msg = msg
-        
+    
+    def find_stop_lane_in_local_path(self):
+        is_stop_lane = False
+        for p in self.local_path_msg.poses:                    
+            for stoplane in self.stoplanes:
+                points = self.lanes[stoplane].points
+                for point in points:
+                    x, y = point[0], point[1]
+                    distance=sqrt(pow(x-p.pose.position.x,2)+pow(y-p.pose.position.y,2))
+                    if distance < 0.5:
+                        is_stop_lane = True
+        return is_stop_lane
+    
     def find_target_velocity(self):
         r = self.find_r()
         velocity = Float32()
