@@ -106,20 +106,22 @@ class local_path_pub :
                 #TODO: (7) Local Path 메세지 Publish
                 self.local_path_pub.publish(self.local_path_msg)
                 
-                # 특정 위치에 정지선이 있는 지 확인
-                is_stop_lane = self.find_stop_lane_in_local_path()
-                                                
-                print("is_stop_lane : ", is_stop_lane)
+                velocity_msg = Float32()
+                velocity_msg = self.find_target_velocity()
                 
-                # 정지선 우선 체크
-                # 곡률보다 감속하므로 lad를 현재 속도에 맞춰줌
-                if 0:
-                    pass
-                else:
-                    velocity_msg = Float32()
-                    velocity_msg = self.find_target_velocity()
+                # 정지선을 매번 체크하는 것보다 우회전하기 위해 충분히 속도를 줄였을 때 정지선을 체크하는게 최적화에 도움됨
+                # 우회전 조건식 넣어주기
+                if 1:
+                    # 특정 위치에 정지선이 있는 지 확인
+                    stop_lane_pos = self.find_stop_lane_in_local_path()
+                    # print("stop_lane_pos : ", stop_lane_pos)
                     
-                    self.velocity_pub.publish(velocity_msg)
+                    # 값이 있으면 속도 덮어씌우기
+                    if len(stop_lane_pos) != 0:
+                        velocity_msg = self.find_target_velocity_stoplane(stop_lane_pos)
+                        
+                    
+                self.velocity_pub.publish(velocity_msg)
 
             rate.sleep()
 
@@ -133,8 +135,20 @@ class local_path_pub :
         self.is_path = True
         self.global_path_msg = msg
     
+    def find_target_velocity_stoplane(self, stop_lane_pos):
+        
+        # 아마 직진거리로 계산할 경우 곡선 형태의 감속 구간에서 언더스티어날듯
+        # 노드마다 거리합으로 바꿔줘야됨
+        distance=sqrt(pow(self.x-stop_lane_pos[0],2)+pow(self.y-stop_lane_pos[1],2))
+        # 감속 최대(10m/s^2)
+        
+        # v^2 = u^2 + 2as
+        velocity = Float32()
+        velocity = sqrt(2 * 10 * distance)
+        print(velocity)
+        return velocity
+                
     def find_stop_lane_in_local_path(self):
-        is_stop_lane = False
         for p in self.local_path_msg.poses:                    
             for stoplane in self.stoplanes:
                 points = self.lanes[stoplane].points
@@ -142,8 +156,8 @@ class local_path_pub :
                     x, y = point[0], point[1]
                     distance=sqrt(pow(x-p.pose.position.x,2)+pow(y-p.pose.position.y,2))
                     if distance < 0.5:
-                        is_stop_lane = True
-        return is_stop_lane
+                        return [x, y]
+        return []
     
     def find_target_velocity(self):
         r = self.find_r()
