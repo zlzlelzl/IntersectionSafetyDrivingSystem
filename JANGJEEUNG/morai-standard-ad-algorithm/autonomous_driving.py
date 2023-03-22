@@ -502,7 +502,72 @@ plt.scatter(*np_lane_boundary_set.T, c="blue", s = 1, label="boundary")
 
 
 plt.legend(loc='best')
+# plt.show()
+
+points = [
+    [79.599958545819391, 1873.4539978001267], [82.986958549532574, 1873.4809977998957]
+    # [
+    #     173.06895869743312,
+    #     1482.5049978024326,
+    #     -0.6400001678466793
+    #   ],
+    #   [
+    #     173.0709586974699,
+    #     1484.6519978004508,
+    #     -0.6069992218017575
+    #   ],
+    #   [
+    #     173.07395869790344,
+    #     1486.7919978015125,
+    #     -0.5740001831054684
+    #   ],
+    #   [
+    #     173.07595869811485,
+    #     1488.4739977996796,
+    #     -0.5479992065429684
+    #   ],
+    #   [
+    #     173.0779586964636,
+    #     1490.1439977986738,
+    #     -0.522999588012695
+    #   ]
+      ]
+
+np_points = np.array(points)
+xlim = np.average(np_points.T[0])
+ylim = np.average(np_points.T[1])
+plt.xlim(xlim-50,xlim+50)
+plt.ylim(ylim-50,ylim+50)
+plt.scatter(np_points.T[0], np_points.T[1])
 plt.show()
-
-
 # %%
+# point_lane_boundary_set.sort()
+list(filter(lambda x: 136<=x[0]<137 and 1353<=x[1]<1355, point_lane_boundary_set))
+
+# 138.4309586532181,
+# 1353.4829978016205,
+
+# 점선
+# "lane_type": 525,
+# "lane_sub_type": 0,
+# "lane_color": "white",
+# "lane_shape": [
+#     "Broken"
+# ],
+# "lane_width": 0.15,
+# "dash_interval_L1": 0.75,
+# "dash_interval_L2": 0.75,
+# "double_line_interval": 0.1,
+
+# 실선(정지선)
+# "lane_type_def": "",
+# "lane_type": 530,
+# "lane_sub_type": 0,
+# "lane_color": "white",
+# "lane_shape": [
+#     "Solid"
+# ],
+# "lane_width": 0.6,
+# "dash_interval_L1": 0,
+# "dash_interval_L2": 0,
+# "double_line_interval": 0.1,

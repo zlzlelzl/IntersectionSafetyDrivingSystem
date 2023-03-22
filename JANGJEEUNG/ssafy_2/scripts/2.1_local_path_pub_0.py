@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import sys
 import rospy
 import rospkg
 from math import cos, sin, atan2, sqrt, pow, pi
@@ -8,6 +10,7 @@ import numpy as np
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Point32,PoseStamped
 from nav_msgs.msg import Odometry,Path
+from lib.mgeo.class_defs import *
 
 # local_path_pub 은 global Path (전역경로) 데이터를 받아 Local Path (지역경로) 를 만드는 예제입니다.
 # Local Path (지역경로) 는 global Path(전역경로) 에서 차량과 가장 가까운 포인트를 시작으로 만들어 집니다.
@@ -43,6 +46,24 @@ class local_path_pub :
         self.max_velocity = 100.0 / 3.6     # 100 km/h
         self.friction = 0.8
 
+        # 정지선 리스트
+        current_path = os.path.dirname(os.path.realpath(__file__))
+        sys.path.append(current_path)
+        
+        load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_K-City'))
+        mgeo_planner_map = MGeo.create_instance_from_json(load_path)
+
+        lane_boundary_set = mgeo_planner_map.lane_boundary_set
+        self.lanes = lane_boundary_set.lanes
+
+        self.stoplanes = []
+        for lane in self.lanes:
+            # 점선은 525 정지선은 530
+            if 530 in self.lanes[lane].lane_type:
+                self.stoplanes.append(lane)
+                
+        
+        
         rate = rospy.Rate(20) # 20hz
         while not rospy.is_shutdown():
 
@@ -77,9 +98,35 @@ class local_path_pub :
                 velocity_msg = Float32()
                 velocity_msg = self.find_target_velocity()
                 
-                print(x,y)
+                # print(x,y)
+                
+                # import json
+                # data = ""
+                # print("[")
+                # for p in self.local_path_msg.poses:
+                #     pose = p.pose.position
+                #     print("[{0},{1}]".format(pose.x, pose.y))
+                # print("]")
+                    
+                # with open("temp_route.txt", "w") as f:
+                #     f.writelines()
+                # print(self.local_path_msg.poses)
                 #TODO: (7) Local Path 메세지 Publish
                 self.local_path_pub.publish(self.local_path_msg)
+                
+                is_stop_lane = False
+                # 특정 위치에 정지선이 있는 지 확인
+                for p in self.local_path_msg.poses:                    
+                    for stoplane in self.stoplanes:
+                        points = self.lanes[stoplane].points
+                        for point in points:
+                            x, y = point[0], point[1]
+                            distance=sqrt(pow(x-p.pose.position.x,2)+pow(y-p.pose.position.y,2))
+                            if distance < 0.5:
+                                is_stop_lane = True
+                                
+                print("is_stop_lane : ", is_stop_lane)
+                
                 self.velocity_pub.publish(velocity_msg)
 
             rate.sleep()
