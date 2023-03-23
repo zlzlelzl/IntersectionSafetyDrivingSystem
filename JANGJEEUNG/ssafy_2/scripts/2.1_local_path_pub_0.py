@@ -134,29 +134,33 @@ class local_path_pub :
     def global_path_callback(self,msg):
         self.is_path = True
         self.global_path_msg = msg
-    
+            
     def find_target_velocity_stoplane(self, stop_lane_pos):
-        
         # 아마 직진거리로 계산할 경우 곡선 형태의 감속 구간에서 언더스티어날듯
         # 노드마다 거리합으로 바꿔줘야됨
-        distance=sqrt(pow(self.x-stop_lane_pos[0],2)+pow(self.y-stop_lane_pos[1],2))
+        # distance=sqrt(pow(self.x-stop_lane_pos[0],2)+pow(self.y-stop_lane_pos[1],2))
+        distance = stop_lane_pos[2]
         # 감속 최대(10m/s^2)
         
         # v^2 = u^2 + 2as
         velocity = Float32()
         velocity = sqrt(2 * 10 * distance)
-        print(velocity)
+        # print(velocity)
         return velocity
-                
+    
     def find_stop_lane_in_local_path(self):
+        curve_distance=0
+        prev_x, prev_y = self.x, self.y
         for p in self.local_path_msg.poses:                    
+            curve_distance+=sqrt(pow(prev_x-p.pose.position.x,2)+pow(prev_y-p.pose.position.y,2))
+            prev_x, prev_y = p.pose.position.x, p.pose.position.y
             for stoplane in self.stoplanes:
                 points = self.lanes[stoplane].points
                 for point in points:
                     x, y = point[0], point[1]
                     distance=sqrt(pow(x-p.pose.position.x,2)+pow(y-p.pose.position.y,2))
                     if distance < 0.5:
-                        return [x, y]
+                        return [x, y, curve_distance]
         return []
     
     def find_target_velocity(self):
