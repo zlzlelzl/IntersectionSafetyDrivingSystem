@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from collections import deque
 import os
 import sys
 import rospy
@@ -45,22 +46,35 @@ class local_path_pub :
         self.local_path_size = 100          # 50 m
         self.max_velocity = 100.0 / 3.6     # 100 km/h
         self.friction = 0.8
+        
+        self.stopped_time = 0
+        self.ignore_stoplanes = deque()
 
-        # 정지선 리스트
+
         current_path = os.path.dirname(os.path.realpath(__file__))
         sys.path.append(current_path)
         
         load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_K-City'))
         mgeo_planner_map = MGeo.create_instance_from_json(load_path)
 
+        # 정지선 리스트
         lane_boundary_set = mgeo_planner_map.lane_boundary_set
         self.lanes = lane_boundary_set.lanes
-
+        
+        # 횡단보도 리스트
+        scw_set = mgeo_planner_map.scw_set
+        self.scws = scw_set.data
+        
         self.stoplanes = []
         for lane in self.lanes:
             # 점선은 525 정지선은 530
             if 530 in self.lanes[lane].lane_type:
                 self.stoplanes.append(lane)
+                        
+        # print(dir(scw_set.data["B319BS010062"]),
+        #     'bbox_x', 'bbox_y'
+        # )
+        # exit()
         
         rate = rospy.Rate(20) # 20hz
         while not rospy.is_shutdown():
@@ -109,6 +123,8 @@ class local_path_pub :
                 velocity_msg = Float32()
                 velocity_msg = self.find_target_velocity()
                 
+                # n초가 지나면 특정 x, y의 정지선을 무시하는 걸로
+                
                 # 정지선을 매번 체크하는 것보다 우회전하기 위해 충분히 속도를 줄였을 때 정지선을 체크하는게 최적화에 도움됨
                 # 우회전 조건식 넣어주기
                 if 1:
@@ -119,8 +135,17 @@ class local_path_pub :
                     # 값이 있으면 속도 덮어씌우기
                     if len(stop_lane_pos) != 0:
                         velocity_msg = self.find_target_velocity_stoplane(stop_lane_pos)
-                        
-                    
+                        if velocity_msg <= 2:
+                            self.stopped_time += 1
+                            if self.stopped_time >= 20:
+                                if len(self.ignore_stoplanes) > 10:
+                                    self.ignore_stoplanes.pop()
+                                self.ignore_stoplanes.appendleft([stop_lane_pos[0], stop_lane_pos[1]])
+                                self.stopped_time = 0
+                            print(self.ignore_stoplanes, self.stopped_time)
+                        else:
+                            self.stopped_time = 0
+                         
                 self.velocity_pub.publish(velocity_msg)
 
             rate.sleep()
@@ -144,23 +169,38 @@ class local_path_pub :
         
         # v^2 = u^2 + 2as
         velocity = Float32()
-        velocity = sqrt(2 * 10 * distance)
+        velocity = max(0, sqrt(2 * 10 * distance) - 20)
+        
         # print(velocity)
         return velocity
     
     def find_stop_lane_in_local_path(self):
         curve_distance=0
         prev_x, prev_y = self.x, self.y
-        for p in self.local_path_msg.poses:                    
+        for p in self.local_path_msg.poses:
             curve_distance+=sqrt(pow(prev_x-p.pose.position.x,2)+pow(prev_y-p.pose.position.y,2))
             prev_x, prev_y = p.pose.position.x, p.pose.position.y
+            
             for stoplane in self.stoplanes:
                 points = self.lanes[stoplane].points
+                
+                ignore_flag = False
                 for point in points:
+                    
+                    
                     x, y = point[0], point[1]
+                    if len(self.ignore_stoplanes) > 0:
+                        ignore_x, ignore_y = self.ignore_stoplanes[0][0], self.ignore_stoplanes[0][1]
+                        
+                        if x == ignore_x and y == ignore_y:
+                            ignore_flag = True
+                            continue
+                    
                     distance=sqrt(pow(x-p.pose.position.x,2)+pow(y-p.pose.position.y,2))
-                    if distance < 0.5:
+                    if distance < 0.3:
                         return [x, y, curve_distance]
+                
+                    
         return []
     
     def find_target_velocity(self):
