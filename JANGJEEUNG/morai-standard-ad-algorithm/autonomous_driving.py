@@ -168,12 +168,16 @@ for i in range(len(surface_marking_set)):
             point_surface_marking_set.append(surface_marking_set[i]["points"][k][:2])
 
 point_lane_boundary_set = []
+point_lane_boundary_set_530 = []
 
 for i in range(len(lane_boundary_set)):
     for j in range(len(lane_boundary_set[i])):
         for k in range(len(lane_boundary_set[i]["points"])):
-            point_lane_boundary_set.append(lane_boundary_set[i]["points"][k][:2])
-
+            if lane_boundary_set[i]["lane_type"] != 530:
+                point_lane_boundary_set.append(lane_boundary_set[i]["points"][k][:2])
+            else:
+                point_lane_boundary_set_530.append(lane_boundary_set[i]["points"][k][:2])
+                
 point_link_set = []
 
 for i in range(len(link_set)):
@@ -212,6 +216,7 @@ for i in range(len(node_set)):
 np_link = np.array(point_link_set)
 np_node = np.array(point_node_set)
 np_lane_boundary_set = np.array(point_lane_boundary_set)
+np_lane_boundary_set_530 = np.array(point_lane_boundary_set_530)
 np_lane_node_set = np.array(point_lane_node_set)
 np_singlecrosswalk_set = np.array(point_singlecrosswalk_set)
 np_surface_marking_set = np.array(point_surface_marking_set)
@@ -239,7 +244,7 @@ np_traffic_sign_set = np.array(point_traffic_sign_set)
 #     except:
 #         break
 
-# 정지선을 파악해야되는 local_path
+# # 정지선을 파악해야되는 local_path
 # local_path = [
 #  [126.814949,1308.591064]
 # ,[126.987305,1309.064453]
@@ -452,7 +457,7 @@ np_local_path = np.array(local_path)
 
 #%%
 
-plt.scatter(*np_local_path.T)
+plt.scatter(*np_local_path.T, c="blue", s = 3, label="local_path")
 
 ego_size_x = 5
 ego_size_y = 1.5
@@ -481,7 +486,8 @@ plt.ylim([ego_y - 50 , ego_y + 50])
 # plt.ylim([1450, 1550])
 
 # 차선 바운더리
-plt.scatter(*np_lane_boundary_set.T, c="blue", s = 1, label="boundary")
+plt.scatter(*np_lane_boundary_set.T, c="black", s = 2, label="boundary")
+plt.scatter(*np_lane_boundary_set_530.T, c="red", s = 2, label="stoplane")
 # plt.scatter(*np_lane_node_set.T, c="red", s = 5, label="lane_node")
 
 # # 차선 노드, 링크
