@@ -11,7 +11,9 @@ import numpy as np
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Point32,PoseStamped
 from nav_msgs.msg import Odometry,Path
+from morai_msgs.msg import EgoVehicleStatus,ObjectStatusList
 from lib.mgeo.class_defs import *
+from tf.transformations import euler_from_quaternion
 
 # local_path_pub 은 global Path (전역경로) 데이터를 받아 Local Path (지역경로) 를 만드는 예제입니다.
 # Local Path (지역경로) 는 global Path(전역경로) 에서 차량과 가장 가까운 포인트를 시작으로 만들어 집니다.
@@ -33,6 +35,8 @@ class local_path_pub :
         #TODO: (1) Global Path 와 Odometry 데이터 subscriber 생성 
         rospy.Subscriber("odom", Odometry, self.odom_callback)
         rospy.Subscriber('/global_path',Path, self.global_path_callback)
+        rospy.Subscriber("/Object_topic", ObjectStatusList, self.object_info_callback)
+        rospy.Subscriber("/Ego_topic",EgoVehicleStatus, self.status_callback)
 
         #TODO: (2) Local Path publisher 선언
         self.local_path_pub = rospy.Publisher('/local_path',Path, queue_size=1)
@@ -46,6 +50,8 @@ class local_path_pub :
         self.local_path_size = 100          # 50 m
         self.max_velocity = 100.0 / 3.6     # 100 km/h
         self.friction = 0.8
+        
+        self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain = 0.5, distance_gain = 1, time_gap = 0.8, vehicle_length = 2.7)
         
         self.stopped_time = 0
         self.ignore_stoplanes = deque()
@@ -64,6 +70,33 @@ class local_path_pub :
         # 횡단보도 리스트
         scw_set = mgeo_planner_map.scw_set
         self.scws = scw_set.data
+        
+        # 횡단보도 리스트
+        cw_set = mgeo_planner_map.cw_set
+        self.cws = cw_set.data
+        
+        # # print(self.cws)
+        # self.intersection_set = mgeo_planner_map.intersection_controller_set
+        # min_x, min_y, max_x, max_y = 9999,9999,-9999,-9999
+        # for k,v in self.intersection_set.intersection_controllers.items()[:1]:
+        #     print(
+        #         # dir(v),
+
+        #         # dir(self.cws[v.get_signal_list()[0].ref_crosswalk_id]),
+        #         temp_scw = self.cws[v.get_signal_list()[0].
+        #                      ref_crosswalk_id
+        #         dir(self.scw[temp_scw].
+        #             ref_scw_id["B319BS010044"])
+        #         # v.get_signal_list()[0],
+        #           )
+        # exit()
+        
+        # # 교차로 리스트
+        # scw_set = mgeo_planner_map.scw_set
+        # self.scws = scw_set.data
+        
+        # print(dir(mgeo_planner_map))
+        # exit()
         
         self.stoplanes = []
         for lane in self.lanes:
@@ -107,6 +140,18 @@ class local_path_pub :
                         tmp_pose.pose.orientation.w=1
                         self.local_path_msg.poses.append(tmp_pose)
 
+                
+                
+                # self.current_waypoint = self.get_current_waypoint([self.current_postion.x,self.current_postion.y],self.global_path)
+                # self.target_velocity = self.velocity_list[self.current_waypoint]*3.6
+
+                # steering = self.calc_pure_pursuit()
+                # if self.is_look_forward_point :
+                #     self.ctrl_cmd_msg.steering = steering
+                # else : 
+                #     rospy.loginfo("no found forward point")
+                #     self.ctrl_cmd_msg.steering=0.0
+
                 # print(x,y)
                 
                 # import json
@@ -142,17 +187,109 @@ class local_path_pub :
                                     self.ignore_stoplanes.pop()
                                 self.ignore_stoplanes.appendleft([stop_lane_pos[0], stop_lane_pos[1]])
                                 self.stopped_time = 0
-                            print(self.ignore_stoplanes, self.stopped_time)
+                            # print(self.ignore_stoplanes, self.stopped_time)
                         else:
                             self.stopped_time = 0
-                         
+                
+                # global_obj,local_obj
+                result = self.calc_vaild_obj([x,y,self.vehicle_yaw],self.object_data)
+                
+                global_npc_info = result[0] 
+                local_npc_info = result[1] 
+                global_ped_info = result[2] 
+                local_ped_info = result[3] 
+                global_obs_info = result[4] 
+                local_obs_info = result[5] 
+                # print(result)
+                # self.adaptive_cruise_control.check_object(self.path ,global_npc_info, local_npc_info
+                #                                                     ,global_ped_info, local_ped_info
+                #                                                     ,global_obs_info, local_obs_info)
+                # velocity_msg = self.adaptive_cruise_control.get_target_velocity(local_npc_info, local_ped_info, local_obs_info,self.status_msg.velocity.x, self.max_velocity / 3.6)
+                  
+                
+                
+                # output = self.pid.pid(self.target_velocity,self.status_msg.velocity.x*3.6)
+
+                # if output > 0.0:
+                #     self.ctrl_cmd_msg.accel = output
+                #     self.ctrl_cmd_msg.brake = 0.0
+                # else:
+                #     self.ctrl_cmd_msg.accel = 0.0
+                #     self.ctrl_cmd_msg.brake = -output  
+                                                                                                      
+                # print(velocity_msg)
                 self.velocity_pub.publish(velocity_msg)
 
             rate.sleep()
 
+    def calc_vaild_obj(self,status_msg,object_data):
+        
+        self.all_object = object_data        
+        ego_pose_x = status_msg[0]
+        ego_pose_y = status_msg[1]
+        ego_heading = status_msg[2]
+        
+        global_npc_info = []
+        local_npc_info  = []
+        global_ped_info = []
+        local_ped_info  = []
+        global_obs_info = []
+        local_obs_info  = []
+
+        num_of_object = self.all_object.num_of_npcs + self.all_object.num_of_obstacle + self.all_object.num_of_pedestrian        
+        if num_of_object > 0:
+
+            #translation
+            tmp_theta=ego_heading
+            tmp_translation=[ego_pose_x, ego_pose_y]
+            tmp_t=np.array([[cos(tmp_theta), -sin(tmp_theta), tmp_translation[0]],
+                            [sin(tmp_theta),  cos(tmp_theta), tmp_translation[1]],
+                            [0             ,               0,                  1]])
+            tmp_det_t=np.array([[tmp_t[0][0], tmp_t[1][0], -(tmp_t[0][0] * tmp_translation[0] + tmp_t[1][0]*tmp_translation[1])],
+                                [tmp_t[0][1], tmp_t[1][1], -(tmp_t[0][1] * tmp_translation[0] + tmp_t[1][1]*tmp_translation[1])],
+                                [0,0,1]])
+
+            #npc vehicle ranslation        
+            for npc_list in self.all_object.npc_list:
+                global_result=np.array([[npc_list.position.x],[npc_list.position.y],[1]])
+                local_result=tmp_det_t.dot(global_result)
+                if local_result[0][0]> 0 :        
+                    global_npc_info.append([npc_list.type,npc_list.position.x,npc_list.position.y,npc_list.velocity.x])
+                    local_npc_info.append([npc_list.type,local_result[0][0],local_result[1][0],npc_list.velocity.x])
+
+            #ped translation
+            for ped_list in self.all_object.pedestrian_list:
+                global_result=np.array([[ped_list.position.x],[ped_list.position.y],[1]])
+                local_result=tmp_det_t.dot(global_result)
+                if local_result[0][0]> 0 :
+                    global_ped_info.append([ped_list.type,ped_list.position.x,ped_list.position.y,ped_list.velocity.x])
+                    local_ped_info.append([ped_list.type,local_result[0][0],local_result[1][0],ped_list.velocity.x])
+
+            #obs translation
+            for obs_list in self.all_object.obstacle_list:
+                global_result=np.array([[obs_list.position.x],[obs_list.position.y],[1]])
+                local_result=tmp_det_t.dot(global_result)
+                if local_result[0][0]> 0 :
+                    global_obs_info.append([obs_list.type,obs_list.position.x,obs_list.position.y,obs_list.velocity.x])
+                    local_obs_info.append([obs_list.type,local_result[0][0],local_result[1][0],obs_list.velocity.x])
+                
+        return global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info
+
+    def object_info_callback(self,data): ## Object information Subscriber
+        self.is_object_info = True
+        self.object_data = data 
+
+    def status_callback(self,msg): ## Vehicl Status Subscriber 
+        self.is_status=True
+        self.status_msg=msg    
+
     def odom_callback(self,msg):
         self.is_odom = True
         #TODO: (4) 콜백함수에서 처음 메시지가 들어오면 현재 위치를 저장
+        
+        odom_quaternion=(msg.pose.pose.orientation.x,msg.pose.pose.orientation.y,msg.pose.pose.orientation.z,msg.pose.pose.orientation.w)
+        _,_,self.vehicle_yaw=euler_from_quaternion(odom_quaternion)
+        
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
 
@@ -169,7 +306,7 @@ class local_path_pub :
         
         # v^2 = u^2 + 2as
         velocity = Float32()
-        velocity = max(0, sqrt(2 * 10 * distance) - 20)
+        velocity = max(0, sqrt(2 * 10 * distance) - 15)
         
         # print(velocity)
         return velocity
@@ -180,7 +317,7 @@ class local_path_pub :
         for p in self.local_path_msg.poses:
             curve_distance+=sqrt(pow(prev_x-p.pose.position.x,2)+pow(prev_y-p.pose.position.y,2))
             prev_x, prev_y = p.pose.position.x, p.pose.position.y
-            
+            print(self.ignore_stoplanes)
             for stoplane in self.stoplanes:
                 points = self.lanes[stoplane].points
                 
@@ -268,6 +405,102 @@ class local_path_pub :
         r = min(min_small_r,big_r)
 
         return r
+
+class AdaptiveCruiseControl:
+    def __init__(self, velocity_gain, distance_gain, time_gap, vehicle_length):
+        self.npc_vehicle=[False,0]
+        self.object=[False,0]
+        self.Person=[False,0]
+        self.velocity_gain = velocity_gain
+        self.distance_gain = distance_gain
+        self.time_gap = time_gap
+        self.vehicle_length = vehicle_length
+
+        self.object_type = None
+        self.object_distance = 0
+        self.object_velocity = 0
+
+    def check_object(self,ref_path, global_npc_info, local_npc_info, 
+                                    global_ped_info, local_ped_info, 
+                                    global_obs_info, local_obs_info):
+        #TODO: (8) 경로상의 장애물 유무 확인 (차량, 사람, 정지선 신호)
+        min_rel_distance=float('inf')
+        if len(global_ped_info) > 0 :        
+            for i in range(len(global_ped_info)):
+                for path in ref_path.poses :      
+                    if global_ped_info[i][0] == 0 : # type=0 [pedestrian]                    
+                        dis=sqrt(pow(path.pose.position.x-global_ped_info[i][1],2)+pow(path.pose.position.y-global_ped_info[i][2],2))
+                        if dis<2.35:                            
+                            rel_distance= sqrt(pow(local_ped_info[i][1],2)+pow(local_ped_info[i][2],2))
+                            if rel_distance < min_rel_distance:
+                                min_rel_distance=rel_distance
+                                self.Person=[True,i]
+
+        if len(global_npc_info) > 0 :            
+            for i in range(len(global_npc_info)):
+                for path in ref_path.poses :      
+                    if global_npc_info[i][0] == 1 : # type=1 [npc_vehicle] 
+                        dis=sqrt(pow(path.pose.position.x-global_npc_info[i][1],2)+pow(path.pose.position.y-global_npc_info[i][2],2))
+                        if dis<2.35:
+                            rel_distance= sqrt(pow(local_npc_info[i][1],2)+pow(local_npc_info[i][2],2))                            
+                            if rel_distance < min_rel_distance:
+                                min_rel_distance=rel_distance
+                                self.npc_vehicle=[True,i]
+
+        if len(global_obs_info) > 0 :            
+            for i in range(len(global_obs_info)):
+                for path in ref_path.poses :      
+                    if global_obs_info[i][0] == 2 : # type=1 [obstacle] 
+                        dis=sqrt(pow(path.pose.position.x-global_obs_info[i][1],2)+pow(path.pose.position.y-global_obs_info[i][2],2))
+                        if dis<2.35:
+                            rel_distance= sqrt(pow(local_obs_info[i][1],2)+pow(local_obs_info[i][2],2))                            
+                            if rel_distance < min_rel_distance:
+                                min_rel_distance=rel_distance
+                                # self.object=[True,i] 
+
+    def get_target_velocity(self, local_npc_info, local_ped_info, local_obs_info, ego_vel, target_vel): 
+        #TODO: (9) 장애물과의 속도와 거리 차이를 이용하여 ACC 를 진행 목표 속도를 설정
+        out_vel =  target_vel
+        default_space = 8
+        time_gap = self.time_gap
+        v_gain = self.velocity_gain
+        x_errgain = self.distance_gain
+
+        if self.npc_vehicle[0] and len(local_npc_info) != 0: #ACC ON_vehicle   
+            print("ACC ON NPC_Vehicle")         
+            front_vehicle = [local_npc_info[self.npc_vehicle[1]][1], local_npc_info[self.npc_vehicle[1]][2], local_npc_info[self.npc_vehicle[1]][3]]
+            
+            dis_safe = ego_vel * time_gap + default_space
+            dis_rel = sqrt(pow(front_vehicle[0],2) + pow(front_vehicle[1],2))            
+            vel_rel=((front_vehicle[2] / 3.6) - ego_vel)                        
+            acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)
+
+            out_vel = ego_vel + acceleration      
+
+        if self.Person[0] and len(local_ped_info) != 0: #ACC ON_Pedestrian
+            print("ACC ON Pedestrian")
+            Pedestrian = [local_ped_info[self.Person[1]][1], local_ped_info[self.Person[1]][2], local_ped_info[self.Person[1]][3]]
+            
+            dis_safe = ego_vel* time_gap + default_space
+            dis_rel = sqrt(pow(Pedestrian[0],2) + pow(Pedestrian[1],2))            
+            vel_rel = (Pedestrian[2] - ego_vel)              
+            acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)    
+
+            out_vel = ego_vel + acceleration
+   
+        if self.object[0] and len(local_obs_info) != 0: #ACC ON_obstacle     
+            print("ACC ON Obstacle")                    
+            Obstacle = [local_obs_info[self.object[1]][1], local_obs_info[self.object[1]][2], local_obs_info[self.object[1]][3]]
+            
+            dis_safe = ego_vel* time_gap + default_space
+            dis_rel = sqrt(pow(Obstacle[0],2) + pow(Obstacle[1],2))            
+            vel_rel = (Obstacle[2] - ego_vel)
+            acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)    
+
+            out_vel = ego_vel + acceleration           
+
+        return out_vel * 3.6
+
 
 if __name__ == '__main__':
     try:
