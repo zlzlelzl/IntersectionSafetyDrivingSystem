@@ -40,7 +40,8 @@ class local_path_pub :
 
         #TODO: (2) Local Path publisher 선언
         self.local_path_pub = rospy.Publisher('/local_path',Path, queue_size=1)
-        self.velocity_pub = rospy.Publisher('/velocity', Float32, queue_size=1)
+        self.velocity_pub = rospy.Publisher('/velocity1', Float32, queue_size=1)
+        self.stoplane_pub = rospy.Publisher('/stoplane', Path, queue_size=1)
         
         # 초기화
         self.is_odom = False
@@ -48,14 +49,13 @@ class local_path_pub :
 
         #TODO: (3) Local Path 의 Size 결정
         self.local_path_size = 100          # 50 m
-        self.max_velocity = 100.0 / 3.6     # 100 km/h
+        self.max_velocity = 60.0 / 3.6     # 100 km/h
         self.friction = 0.8
         
         self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain = 0.5, distance_gain = 1, time_gap = 0.8, vehicle_length = 2.7)
         
         self.stopped_time = 0
         self.ignore_stoplanes = deque()
-
 
         current_path = os.path.dirname(os.path.realpath(__file__))
         sys.path.append(current_path)
@@ -109,7 +109,7 @@ class local_path_pub :
         # )
         # exit()
         
-        rate = rospy.Rate(20) # 20hz
+        rate = rospy.Rate(30) # 30hz
         while not rospy.is_shutdown():
 
             if self.is_odom == True and self.is_path == True:
@@ -191,33 +191,23 @@ class local_path_pub :
                         else:
                             self.stopped_time = 0
                 
-                # global_obj,local_obj
-                result = self.calc_vaild_obj([x,y,self.vehicle_yaw],self.object_data)
+                # # global_obj,local_obj
+                # result = self.calc_vaild_obj([x,y,self.vehicle_yaw],self.object_data)
                 
-                global_npc_info = result[0] 
-                local_npc_info = result[1] 
-                global_ped_info = result[2] 
-                local_ped_info = result[3] 
-                global_obs_info = result[4] 
-                local_obs_info = result[5] 
-                # print(result)
-                # self.adaptive_cruise_control.check_object(self.path ,global_npc_info, local_npc_info
+                # global_npc_info = result[0] 
+                # local_npc_info = result[1] 
+                # global_ped_info = result[2] 
+                # local_ped_info = result[3] 
+                # global_obs_info = result[4] 
+                # local_obs_info = result[5]
+                
+                # self.adaptive_cruise_control.check_object(self.global_path_msg ,global_npc_info, local_npc_info
                 #                                                     ,global_ped_info, local_ped_info
                 #                                                     ,global_obs_info, local_obs_info)
-                # velocity_msg = self.adaptive_cruise_control.get_target_velocity(local_npc_info, local_ped_info, local_obs_info,self.status_msg.velocity.x, self.max_velocity / 3.6)
-                  
-                
-                
-                # output = self.pid.pid(self.target_velocity,self.status_msg.velocity.x*3.6)
-
-                # if output > 0.0:
-                #     self.ctrl_cmd_msg.accel = output
-                #     self.ctrl_cmd_msg.brake = 0.0
-                # else:
-                #     self.ctrl_cmd_msg.accel = 0.0
-                #     self.ctrl_cmd_msg.brake = -output  
-                                                                                                      
                 # print(velocity_msg)
+                # velocity_msg = self.adaptive_cruise_control.get_target_velocity(local_npc_info, local_ped_info, local_obs_info,self.status_msg.velocity.x, velocity_msg / 3.6)
+                # print(velocity_msg)
+                
                 self.velocity_pub.publish(velocity_msg)
 
             rate.sleep()
@@ -317,13 +307,12 @@ class local_path_pub :
         for p in self.local_path_msg.poses:
             curve_distance+=sqrt(pow(prev_x-p.pose.position.x,2)+pow(prev_y-p.pose.position.y,2))
             prev_x, prev_y = p.pose.position.x, p.pose.position.y
-            print(self.ignore_stoplanes)
+            # print(self.ignore_stoplanes)
             for stoplane in self.stoplanes:
                 points = self.lanes[stoplane].points
                 
                 ignore_flag = False
                 for point in points:
-                    
                     
                     x, y = point[0], point[1]
                     if len(self.ignore_stoplanes) > 0:
@@ -453,15 +442,15 @@ class AdaptiveCruiseControl:
                     if global_obs_info[i][0] == 2 : # type=1 [obstacle] 
                         dis=sqrt(pow(path.pose.position.x-global_obs_info[i][1],2)+pow(path.pose.position.y-global_obs_info[i][2],2))
                         if dis<2.35:
-                            rel_distance= sqrt(pow(local_obs_info[i][1],2)+pow(local_obs_info[i][2],2))                            
+                            rel_distance= sqrt(pow(local_obs_info[i][1],2)+pow(local_obs_info[i][2],2))
                             if rel_distance < min_rel_distance:
                                 min_rel_distance=rel_distance
                                 # self.object=[True,i] 
 
     def get_target_velocity(self, local_npc_info, local_ped_info, local_obs_info, ego_vel, target_vel): 
         #TODO: (9) 장애물과의 속도와 거리 차이를 이용하여 ACC 를 진행 목표 속도를 설정
-        out_vel =  target_vel
-        default_space = 8
+        out_vel = target_vel
+        default_space = 20
         time_gap = self.time_gap
         v_gain = self.velocity_gain
         x_errgain = self.distance_gain

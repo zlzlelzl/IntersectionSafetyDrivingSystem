@@ -21,14 +21,16 @@ class ctrl_cmd_pub:
         
         # 구독, 발행 함수 선언
         rospy.Subscriber("/local_path", Path, self.path_callback)
-        rospy.Subscriber('/velocity', Float32, self.velocity_callback)
+        rospy.Subscriber('/velocity1', Float32, self.velocity_callback1)
+        rospy.Subscriber('/velocity2', Float32, self.velocity_callback2)
         rospy.Subscriber("/odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
         self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
         
         # 데이터 유무 플래그
         self.is_path = False
-        self.is_velocity = False
+        self.is_velocity1 = False
+        self.is_velocity2 = False
         self.is_odom = False
         self.is_status = False
         self.is_target_point = False
@@ -38,7 +40,7 @@ class ctrl_cmd_pub:
         self.ctrl_cmd_msg.longlCmdType = 1
         
         # 물리 변수 선언
-        self.max_velocity = 100.0 / 3.6
+        self.max_velocity = 60.0 / 3.6
         self.friction = 0.8
         
         self.r = float('inf')
@@ -53,23 +55,26 @@ class ctrl_cmd_pub:
         self.steering_pid = pidControl(1.00, 0.00, 0.00)
 
         self.target_steering = 0.0
-        self.target_velocity = 100 / 3.6
+        self.target_velocity = 60 / 3.6
 
         rate = rospy.Rate(30)
         
         rospy.loginfo('ctrl_cmd_pub ready')
 
         while not rospy.is_shutdown():
-            if self.is_path is True and self.is_odom is True and self.is_status is True and self.is_velocity is True: # 메시지 수신 확인
+            if self.is_path is True and self.is_odom is True and self.is_status is True and self.is_velocity1 is True and self.is_velocity2 is True: # 메시지 수신 확인
                 
-                rospy.loginfo('is msg true')
+                # rospy.loginfo('is msg true')
                 
                 self.target_steering = self.find_target_steering()
-                rospy.loginfo('target_velocity: {}'.format(self.target_velocity))
-                rospy.loginfo('target_steering: {}'.format(self.target_steering))
+                # rospy.loginfo('target_velocity1: {}'.format(self.target_velocity1))
+                # rospy.loginfo('target_velocity2: {}'.format(self.target_velocity2))
+                # rospy.loginfo('target_steering: {}'.format(self.target_steering))
                 
-                velocity_output = self.velocity_pid.output(self.target_velocity, self.status_msg.velocity.x)
+                velocity_output = self.velocity_pid.output(min(self.target_velocity1, self.target_velocity2 / 3.6), self.status_msg.velocity.x)
                 steering_output = self.steering_pid.output(self.target_steering, 0.0)
+                
+                print(self.target_velocity1, self.target_velocity2)
 
                 if velocity_output > 0.0:
                     self.ctrl_cmd_msg.accel = velocity_output
@@ -90,11 +95,17 @@ class ctrl_cmd_pub:
         
         self.is_path = True
     
-    def velocity_callback(self, msg):
+    def velocity_callback1(self, msg):
         
-        self.target_velocity = msg.data
+        self.target_velocity1 = msg.data
         
-        self.is_velocity = True
+        self.is_velocity1 = True
+        
+    def velocity_callback2(self, msg):
+        
+        self.target_velocity2 = msg.data
+        
+        self.is_velocity2 = True
     
     def odom_callback(self, msg):
         self.current_position = msg.pose.pose.position

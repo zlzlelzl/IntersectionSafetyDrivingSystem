@@ -75,7 +75,7 @@ class local_path_pub :
                             tmp_pose.pose.orientation.w=1
                             local_path_msg.poses.append(tmp_pose)
 
-                print(x,y)
+                # print(x,y)
                 #TODO: (7) Local Path 메세지 Publish
                 self.local_path_pub.publish(local_path_msg)
 

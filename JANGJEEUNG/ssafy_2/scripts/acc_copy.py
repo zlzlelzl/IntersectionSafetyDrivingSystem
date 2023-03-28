@@ -5,6 +5,7 @@ import rospy
 import rospkg
 from math import cos,sin,pi,sqrt,pow,atan2
 from geometry_msgs.msg import Point,PoseWithCovarianceStamped
+from std_msgs.msg import Float32
 from nav_msgs.msg import Odometry,Path
 from morai_msgs.msg import CtrlCmd,EgoVehicleStatus,ObjectStatusList
 import numpy as np
@@ -37,10 +38,11 @@ class pure_pursuit :
         rospy.Subscriber("odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic",EgoVehicleStatus, self.status_callback)
         rospy.Subscriber("/Object_topic", ObjectStatusList, self.object_info_callback)
-        self.ctrl_cmd_pub = rospy.Publisher('ctrl_cmd',CtrlCmd, queue_size=1)
-
-        self.ctrl_cmd_msg = CtrlCmd()
-        self.ctrl_cmd_msg.longlCmdType = 1
+        
+        #TODO: (2) Local Path publisher 선언
+        self.local_path_pub = rospy.Publisher('/local_path',Path, queue_size=1)
+        self.velocity_pub = rospy.Publisher('/velocity2', Float32, queue_size=1)
+        self.stoplane_pub = rospy.Publisher('/stoplane', Path, queue_size=1)
 
         self.is_path = False
         self.is_odom = False
@@ -59,9 +61,10 @@ class pure_pursuit :
         self.lfd_gain = 0.78
         self.target_velocity = 60
 
-        self.pid = pidControl()
         self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain = 0.5, distance_gain = 1, time_gap = 0.8, vehicle_length = 2.7)
+        
         self.vel_planning = velocityPlanning(self.target_velocity/3.6, 0.15)
+        # print(1)
 
         while True:
             if self.is_global_path == True:
@@ -83,17 +86,17 @@ class pure_pursuit :
                 global_ped_info = result[2] 
                 local_ped_info = result[3] 
                 global_obs_info = result[4] 
-                local_obs_info = result[5] 
+                local_obs_info = result[5]
                 
                 self.current_waypoint = self.get_current_waypoint([self.current_postion.x,self.current_postion.y],self.global_path)
                 self.target_velocity = self.velocity_list[self.current_waypoint]*3.6
 
-                steering = self.calc_pure_pursuit()
-                if self.is_look_forward_point :
-                    self.ctrl_cmd_msg.steering = steering
-                else : 
-                    rospy.loginfo("no found forward point")
-                    self.ctrl_cmd_msg.steering=0.0
+                # steering = self.calc_pure_pursuit()
+                # if self.is_look_forward_point :
+                #     self.ctrl_cmd_msg.steering = steering
+                # else : 
+                #     rospy.loginfo("no found forward point")
+                #     self.ctrl_cmd_msg.steering=0.0
 
                 # self.adaptive_cruise_control.check_object(self.path, local_obj, global_obj,current_traffic_light=[])
                 self.adaptive_cruise_control.check_object(self.path ,global_npc_info, local_npc_info
@@ -102,20 +105,10 @@ class pure_pursuit :
                 # self.target_velocity = self.adaptive_cruise_control.get_target_velocity(self.status_msg.velocity.x, self.target_velocity/3.6)
                 self.target_velocity = self.adaptive_cruise_control.get_target_velocity(local_npc_info, local_ped_info, local_obs_info,
                                                                                                         self.status_msg.velocity.x, self.target_velocity/3.6)
-                # print(self.target_velocity)
-                output = self.pid.pid(self.target_velocity,self.status_msg.velocity.x*3.6)
-                # print(output)
-
-                if output > 0.0:
-                    self.ctrl_cmd_msg.accel = output
-                    self.ctrl_cmd_msg.brake = 0.0
-                else:
-                    self.ctrl_cmd_msg.accel = 0.0
-                    self.ctrl_cmd_msg.brake = -output
-
+                
+                self.velocity_pub.publish(self.target_velocity)
+                
                 #TODO: (10) 제어입력 메세지 Publish
-                self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
-
             rate.sleep()
 
     def path_callback(self,msg):
@@ -252,28 +245,6 @@ class pure_pursuit :
         steering = atan2((2*self.vehicle_length*sin(theta)),self.lfd)
 
         return steering
-
-class pidControl:
-    def __init__(self):
-        self.p_gain = 0.3
-        self.i_gain = 0.00
-        self.d_gain = 0.03
-        self.prev_error = 0
-        self.i_control = 0
-        self.controlTime = 0.02
-
-    def pid(self,target_vel, current_vel):
-        error = target_vel - current_vel
-
-        #TODO: (5) PID 제어 생성
-        p_control = self.p_gain * error
-        self.i_control += self.i_gain * error * self.controlTime
-        d_control = self.d_gain * (error-self.prev_error) / self.controlTime
-
-        output = p_control + self.i_control + d_control
-        self.prev_error = error
-
-        return output
 
 class velocityPlanning:
     def __init__ (self,car_max_speed, road_friciton):

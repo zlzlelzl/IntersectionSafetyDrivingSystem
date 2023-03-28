@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from collections import deque
 import rospy
 import rospkg
 import sys
@@ -56,6 +57,9 @@ class dijkstra_path_pub :
         #TODO: (2) 시작 Node 와 종료 Node 정의
         self.start_node = 'A119BS010184'
         self.end_node = 'A119BS010148'
+        
+        self.vias = ["A119BS010269"]
+        
 
         self.global_path_msg = Path()
         self.global_path_msg.header.frame_id = '/map'
@@ -70,20 +74,23 @@ class dijkstra_path_pub :
 
     def calc_dijkstra_path_node(self, start_node, end_node):
 
-        result, path = self.global_planner.find_shortest_path(start_node, end_node)
-
         #TODO: (10) dijkstra 경로 데이터를 ROS Path 메세지 형식에 맞춰 정의
         out_path = Path()
         out_path.header.frame_id = '/map'
+        
+        q = deque([start_node] + self.vias + [end_node])
+        
+        for i in range(len(q) - 1):
+            result, path = self.global_planner.find_shortest_path(q[i], q[i+1])
 
-        for waypoint in path["point_path"] :
-            path_x = waypoint[0]
-            path_y = waypoint[1]
-            read_pose = PoseStamped()
-            read_pose.pose.position.x = path_x
-            read_pose.pose.position.y = path_y
-            read_pose.pose.orientation.w = 1
-            out_path.poses.append(read_pose)   
+            for waypoint in path["point_path"] :
+                path_x = waypoint[0]
+                path_y = waypoint[1]
+                read_pose = PoseStamped()
+                read_pose.pose.position.x = path_x 
+                read_pose.pose.position.y = path_y
+                read_pose.pose.orientation.w = 1
+                out_path.poses.append(read_pose)   
 
         return out_path
 
