@@ -1,6 +1,22 @@
 #%%
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+
+import os
+import sys
+import rospy
+import rospkg
+from math import cos, sin, atan2, sqrt, pow, pi
+import numpy as np
+from std_msgs.msg import Float32
+from geometry_msgs.msg import Point32,PoseStamped
+from nav_msgs.msg import Odometry,Path
+from morai_msgs.msg import CtrlCmd,EgoVehicleStatus,ObjectStatusList,GetTrafficLightStatus
+
+from mgeo.lib.mgeo.class_defs import *
+from collections import deque
+
 import numpy as np
 import matplotlib.pyplot as plt
 from perception.forward_object_detector import ForwardObjectDetector
@@ -454,10 +470,75 @@ local_path = [
 
 np_local_path = np.array(local_path)
 
-
 #%%
 
-plt.scatter(*np_local_path.T, c="blue", s = 3, label="local_path")
+
+# 정지선 리스트
+
+current_path = os.path.dirname(os.path.realpath('/root/catkin_ws/src/ssafy_2/scripts/local_path_pub_0_1.py'))
+sys.path.append(current_path)
+
+load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_K-City'))
+mgeo_planner_map = MGeo.create_instance_from_json(load_path)
+
+lane_boundary_set = mgeo_planner_map.lane_boundary_set
+lanes = lane_boundary_set.lanes
+
+# 정지선 변수
+stopped_time = 0
+ignore_stoplanes = deque()
+
+# 횡단보도 리스트
+cw_set = mgeo_planner_map.cw_set
+cws = cw_set.data
+scw_set = mgeo_planner_map.scw_set
+scws = scw_set.data
+
+
+# mgeo에서 신호,교차로 정보 받아오기
+is_traffic_light = False 
+traffic_set = mgeo_planner_map.light_set
+intersection_set = mgeo_planner_map.intersection_controller_set
+intersection_state_set = mgeo_planner_map.intersection_state_list
+
+stoplanes = []
+for lane in lanes:
+    # 점선은 525 정지선은 530
+    if 530 == lanes[lane].lane_type:
+        stoplanes.append(lane)
+
+# 교차로 boundary 설정
+intersection_points = []
+import time
+S = time.process_time()
+count = 0
+bbox = []
+for k,v in intersection_set.intersection_controllers.items():
+    min_x, min_y, max_x, max_y = 9999,9999,-9999,-9999
+    #print(k)
+    #print(list(v.get_signal_list()))
+    for sig in list(v.get_signal_list()):
+        #print(sig.ref_crosswalk_id)
+        for scws_idx,value in scws.items():
+            # count += 1
+            # print(value.bbox_x[1] - value.bbox_x[0], value.bbox_y[1] - value.bbox_y[0])
+            xx = value.bbox_x
+            yy = value.bbox_y
+            for x in xx:
+                for y in yy:
+                    bbox.append([x,y])
+
+            #print(value.ref_crosswalk_id)
+            if value.ref_crosswalk_id == sig.ref_crosswalk_id:
+                # print(value.ref_crosswalk_id)
+                # print(value.points)
+                for i in range(0,5):
+                    min_x = min(min_x,value.points[i][0])
+                    min_y = min(min_y,value.points[i][1])
+                    max_x = max(max_x,value.points[i][0])
+                    max_y = max(max_y,value.points[i][1])
+    intersection_points.append([min_x,min_y,max_x,max_y])
+E = time.process_time()
 
 ego_size_x = 5
 ego_size_y = 1.5
@@ -469,9 +550,12 @@ rec = patches.Rectangle((ego_x,ego_y), ego_size_x, ego_size_y, angle=ego_angle, 
 # plt.gca().add_patch(rec)
 
 # 차체 중심
-plt.xlim([ego_x - 50 , ego_x + 50])
-plt.ylim([ego_y - 50 , ego_y + 50])
+# plt.xlim([ego_x - 50 , ego_x + 50])
+# plt.ylim([ego_y - 50 , ego_y + 50])
 
+# # 횡단보도 확인용
+# plt.xlim([60, 120])
+# plt.ylim([1230, 1270])
 
 # # 교차로 시작 북쪽
 # plt.xlim([120, 160])
@@ -485,17 +569,23 @@ plt.ylim([ego_y - 50 , ego_y + 50])
 # plt.xlim([80, 180])
 # plt.ylim([1450, 1550])
 
+# # local_path
+# plt.scatter(*np_local_path.T, c="blue", s = 3, label="local_path")
+
 # 차선 바운더리
-plt.scatter(*np_lane_boundary_set.T, c="black", s = 2, label="boundary")
-plt.scatter(*np_lane_boundary_set_530.T, c="red", s = 2, label="stoplane")
+plt.scatter(*np_lane_boundary_set.T, c="yellow", s = 2, label="boundary")
+# plt.scatter(*np_lane_boundary_set_530.T, c="red", s = 2, label="stoplane")
 # plt.scatter(*np_lane_node_set.T, c="red", s = 5, label="lane_node")
+
+# SCW
+# plt.scatter(*np_bbox.T, c="black", s = 2, label="boundary")
 
 # # 차선 노드, 링크
 # plt.scatter(*np_link.T, c="green", s = 1, label="link" )
 # plt.scatter(*np_node.T, c="blue", s = 5, label="node")
 
-# # 횡단 보도
-# plt.scatter(*np_singlecrosswalk_set.T, c="red",s = 5, label="crosswalk")
+# 횡단 보도
+plt.scatter(*np_singlecrosswalk_set.T, c="red",s = 5, label="crosswalk")
 # # 도로 마커
 # plt.scatter(*np_surface_marking_set.T, c="black", s = 1, label="marker")
 
@@ -584,3 +674,5 @@ list(filter(lambda x: 136<=x[0]<137 and 1353<=x[1]<1355, point_lane_boundary_set
 # "dash_interval_L1": 0,
 # "dash_interval_L2": 0,
 # "double_line_interval": 0.1,
+
+#%%
