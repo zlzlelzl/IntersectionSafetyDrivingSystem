@@ -2,13 +2,14 @@
     <node pkg="ssafy_2" type="mgeo_pub.py" name="mgeo_pub"  />
     <node pkg="ssafy_2" type="gpsimu_parser.py" name="gpsimu_parser" />
     <!-- <node pkg="ssafy_2" type="global_path_pub.py" name="global_path_pub"  /> -->
-    <!-- <node pkg="ssafy_2" type="mgeo_dijkstra_path_1.py" name="mgeo_dijkstra_path"  /> -->
+    <node pkg="ssafy_2" type="mgeo_dijkstra_path_0_1.py" name="mgeo_dijkstra_path"  />
     <!-- <node pkg="ssafy_2" type="local_path_pub.py" name="local_path_pub" /> -->
-    <node pkg="ssafy_2" type="twoend_dijkstra.py" name="twoend_dijkstra" />
+    <!-- <node pkg="ssafy_2" type="twoend_dijkstra.py" name="twoend_dijkstra" /> -->
     <!-- <node pkg="ssafy_2" type="acc.py" name="acc" output="screen"/> -->
-    <node pkg="ssafy_2" type="local_path_pub_0_1.py" name="local_path_pub_0_1" output="screen" />
-    <!-- <node pkg="ssafy_2" type="acc_copy.py" name="acc_copy" output="screen" /> -->
-    <node pkg="ssafy_2" type="ctrl_cmd_pub_0.py" name="ctrl_cmd_pub_0"/>
+    <node pkg="ssafy_2" type="local_path_pub_0_2.py" name="local_path_pub_0_2" />
+    <node pkg="ssafy_2" type="acc_copy.py" name="acc_copy" output="screen"/>
+    <!-- <node pkg="ssafy_2" type="ctrl_cmd_pub_0.py" name="ctrl_cmd_pub_0"/> -->
+    <node pkg="ssafy_2" type="ctrl_cmd_pub_2.py" name="ctrl_cmd_pub_2" output="screen" />
     <!-- <node pkg="ssafy_2" type="acc_pid.py" name="acc_pid" output="screen" /> -->
     <!-- <node pkg="ssafy_2" type="pure_pursuit.py" name="pure_pursuit" output="screen"  /> -->
     <!-- <node pkg="ssafy_2" type="pid_control.py" name="pid_control"  /> -->
