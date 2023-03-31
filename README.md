@@ -133,10 +133,10 @@
         - 곡률에 따른 속도 제어 (가속, 감속 제어)
             - 좌/우회전 시 최대 속도 100km/h 부터 감속 비교
             
-            ![종방향제어before.gif](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/4bafa483-0810-4b81-a835-52b6344573ee/%EC%A2%85%EB%B0%A9%ED%96%A5%EC%A0%9C%EC%96%B4before.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230324%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230324T042132Z&X-Amz-Expires=86400&X-Amz-Signature=d4b1385a7bcb8c175beae720a131027fde9ffa5528616a5153d10dcfd13c713f&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22%25EC%25A2%2585%25EB%25B0%25A9%25ED%2596%25A5%25EC%25A0%259C%25EC%2596%25B4before.gif%22&x-id=GetObject)
+            ![종방향제어before.gif](./readme/종방향제어before.gif)
             
             
-            ![종방향제어after.gif](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/cb47f5e1-17cc-45d5-83f2-f8675869c8e8/%EC%A2%85%EB%B0%A9%ED%96%A5%EC%A0%9C%EC%96%B4after.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230324%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230324T042202Z&X-Amz-Expires=86400&X-Amz-Signature=b841a980e04fc1cb61b3429f2249e9d0be660a44a7e2560b4edf46bd2c2ea248&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22%25EC%25A2%2585%25EB%25B0%25A9%25ED%2596%25A5%25EC%25A0%259C%25EC%2596%25B4after.gif%22&x-id=GetObject)
+            ![종방향제어after.gif](./readme/종방향제어after.gif)
             
     - 횡방향 제어
 
