@@ -1,0 +1,1 @@
+TrafficSign[] traffic_light

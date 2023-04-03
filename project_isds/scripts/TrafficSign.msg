@@ -1,0 +1,2 @@
+int8 traffic_light_type
+int8 traffic_light_status
