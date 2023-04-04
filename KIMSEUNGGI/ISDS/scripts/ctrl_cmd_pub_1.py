@@ -24,7 +24,7 @@ class ctrl_cmd_pub:
         rospy.Subscriber("/local_path", Path, self.path_callback)
         rospy.Subscriber('/velocity1', Float32, self.velocity_callback1)
         rospy.Subscriber('/velocity2', Float32, self.velocity_callback2)
-        rospy.Subscriber('/velocity3', Float32, self.velocity_callback3)
+        # rospy.Subscriber('/velocity3', Float32, self.velocity_callback3)
         rospy.Subscriber("/odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
         self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
@@ -33,7 +33,7 @@ class ctrl_cmd_pub:
         self.is_path = False
         self.is_velocity1 = False
         self.is_velocity2 = False
-        self.is_velocity3 = False
+        # self.is_velocity3 = False
         self.is_odom = False
         self.is_status = False
         self.is_target_point = False
@@ -60,13 +60,13 @@ class ctrl_cmd_pub:
 
         rate = rospy.Rate(30)
         while not rospy.is_shutdown():
-            if self.is_path is True and self.is_odom is True and self.is_status is True and self.is_velocity1 is True and self.is_velocity2 is True and self.is_velocity3 is True: # 메시지 수신 확인
-                # S = time.time()
+            if self.is_path is True and self.is_odom is True and self.is_status is True and self.is_velocity1 is True and self.is_velocity2 is True: # 메시지 수신 확인
+                S = time.time()
                 self.target_steering = self.find_target_steering()
                 
-                # print( self.target_velocity1, self.target_velocity2, self.target_velocity3)
+                print( self.target_velocity1, self.target_velocity2)
 
-                self.target_velocity = min(min(self.target_velocity1,self.target_velocity2),self.target_velocity3)
+                self.target_velocity = min(self.target_velocity1,self.target_velocity2)
 
                 velocity_output = self.velocity_pid.output(self.target_velocity, self.status_msg.velocity.x)
                 steering_output = self.steering_pid.output(self.target_steering, 0.0)
@@ -81,8 +81,8 @@ class ctrl_cmd_pub:
                 self.ctrl_cmd_msg.steering = steering_output
                 
                 self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
-                # E = time.time()
-                # print(E-S)
+                E = time.time()
+                print(E-S)
             rate.sleep()
         
     def path_callback(self, msg):
@@ -102,11 +102,11 @@ class ctrl_cmd_pub:
         
         self.is_velocity2 = True
 
-    def velocity_callback3(self, msg):
+    # def velocity_callback3(self, msg):
         
-        self.target_velocity3 = msg.data
+    #     self.target_velocity3 = msg.data
         
-        self.is_velocity3 = True
+    #     self.is_velocity3 = True
     
     def odom_callback(self, msg):
         self.current_position = msg.pose.pose.position
