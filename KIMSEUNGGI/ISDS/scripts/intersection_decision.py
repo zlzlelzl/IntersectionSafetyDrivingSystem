@@ -10,6 +10,7 @@ from nav_msgs.msg import Path,Odometry
 from morai_msgs.msg import EgoVehicleStatus,TrafficSignInfo
 from lib.mgeo.class_defs import *
 from collections import deque
+import heapq
 from math import cos, sin, atan2, sqrt, pow, pi
 from tf.transformations import euler_from_quaternion
 # my_name_listener 는 Custom Msgs 를 이용한 Topic Subscriber(메세지 수신) 예제입니다.
@@ -83,9 +84,15 @@ class intersection_decision :
         self.is_local_path = False
         self.is_status = False
 
-        self.max_velocity = 40 / 3.6
+        self.max_velocity = 100 / 3.6
         # 현재 신호
         self.traffic_light_sign = 0
+        
+        q = []
+        # t_l_count[green,red]
+        traffic_light_queue = []
+        traffic_light_count = [0,0]
+        prev_stop_lane = [0,0]
 
         rate = rospy.Rate(30) # 30hz.
         while not rospy.is_shutdown():
@@ -117,7 +124,16 @@ class intersection_decision :
                 # 정지선 인지, 거리 계산
                 stop_lane_pos = self.find_stop_lane_in_local_path()
                 if len(stop_lane_pos) != 0:
+                        
                         stop_lane_dis = stop_lane_pos[2]
+                        now_stop_lane = [stop_lane_pos[0],stop_lane_pos[1]]
+                        # print(f'prev = {prev_stop_lane}, now = {now_stop_lane}')
+                        if prev_stop_lane != now_stop_lane:
+                            print("정지선 넘어감")
+                            traffic_light_queue = []
+                            traffic_light_count = [0,0]
+
+                        prev_stop_lane = now_stop_lane
 
                 if is_intersection:
 
@@ -126,9 +142,32 @@ class intersection_decision :
                         now_traffic_light = self.traffic_light_data.traffic_light[0]
 
                         traffic_light_status = now_traffic_light.traffic_light_status
-                        # print(f'신호등 인덱스 = {now_traffic_light_idx}, 신호 = {now_traffic_color}')
-                        # 빨간불 = 1, 노란색 = 4 직진 = 16 좌회전 = 32
-                        print(f'신호 = {traffic_light_status}')
+
+                        
+                        traffic_light_queue.append(traffic_light_status)
+                        print(traffic_light_queue)
+                        if traffic_light_status == 0:
+                            traffic_light_count[0] += 1
+                        elif traffic_light_status == 1:
+                            traffic_light_count[1] += 1
+
+                        if len(traffic_light_queue) >= 10:
+                            temp = traffic_light_queue.pop(0)
+
+                            if temp == 0:
+                                traffic_light_count[0] -= 1
+                            elif temp == 1:
+                                traffic_light_count[1] -= 1
+                        
+                        if traffic_light_count[0] > traffic_light_count[1]:
+                            now_color = 0
+                        else :
+                            now_color = 1 
+                        print(traffic_light_count)
+                        traffic_light_status = now_color
+                        
+                        # if now_traffic_light.traffic_light_type not in [13, 14]:
+                        print(f'신호 = {traffic_light_status}, type = {now_traffic_light.traffic_light_type}')
 
                         #정지 (빨 + 빨+좌)
                         if traffic_light_status == 1:
@@ -210,7 +249,7 @@ class intersection_decision :
                     else:
 
                         if self.traffic_light_sign == 1:
-                            velocity_msg = self.find_target_velocity_stoplane()
+                            velocity_msg = self.find_target_velocity_stoplane(stop_lane_dis)
                         elif self.traffic_light_sign == 0:
                             velocity_msg = self.max_velocity
                         
@@ -244,7 +283,7 @@ class intersection_decision :
                 # else:
                 #     self.traffic_stopped_time = 0
                 # print(velocity_msg)
-                print(f'속도 = {velocity_msg}')
+                # print(f'속도 = {velocity_msg}')
                 self.velocity_pub.publish(velocity_msg)
 
             rate.sleep()
@@ -398,7 +437,7 @@ class intersection_decision :
                     if distance < 0.3:
                         return [x, y, curve_distance]
                 
-                    
+                     
         return []
     
 
