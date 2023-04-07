@@ -60,7 +60,8 @@ class dijkstra_path_pub :
         #TODO: (2) 시작 Node 와 종료 Node 정의
         self.start_node = 'A119BS010184'
         # self.end_node = 'A119BS010260'
-        self.end_node = 'A119BS010695'
+        self.end_node = 'A119BS010147'
+        # self.end_node = 'A119BS010695'
         
         # self.end_node = 'A119BS010163'
         

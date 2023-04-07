@@ -1,0 +1,2 @@
+morai_msgs:project_isds
+-DCATKIN_DEVEL_PREFIX=/home/kimsngi/project_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kimsngi/project_ws/install -G Unix Makefiles
