@@ -126,7 +126,7 @@
 
 ![crosswalk](https://user-images.githubusercontent.com/57744586/227422936-8fe29cbd-37bd-49f4-8a87-2bf87c4dc14f.png)
 
-![Simulator-2023-03-24-10-53-13-_online-video-cutter.com_-_1_.gif](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/fce67bab-93ab-46ae-ad95-341fc8e9424e/Simulator-2023-03-24-10-53-13-_online-video-cutter.com_-_1_.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230324%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230324T042011Z&X-Amz-Expires=86400&X-Amz-Signature=f3c5c3e55d5dd427a039667db1614f8ce431ffd5b2160059ac65e115ba7c081d&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Simulator-2023-03-24-10-53-13-_online-video-cutter.com_-_1_.gif%22&x-id=GetObject)
+![정지선판단.gif](./readme/정지선판단.gif)
 
 - **제어**
     - 종방향 제어
