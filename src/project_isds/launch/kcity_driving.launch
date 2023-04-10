@@ -1,7 +1,7 @@
 <launch>
     <node pkg="project_isds" type="mgeo_pub.py" name="mgeo_pub"  />
     <node pkg="project_isds" type="gpsimu_parser.py" name="gpsimu_parser" />
-    <node pkg="project_isds" type="mgeo_dijkstra_path_0_1.py" name="mgeo_dijkstra_path"  />
+    <node pkg="project_isds" type="global_path_pub.py" name="global_path"  />
     <node pkg="project_isds" type="local_path_pub_0_2.py" name="local_path_pub_0_2" />
     <node pkg="project_isds" type="acc_copy.py" name="acc_copy" output="screen"/>
     <node pkg="project_isds" type="ctrl_cmd_pub_2.py" name="ctrl_cmd_pub_2" output="screen" />

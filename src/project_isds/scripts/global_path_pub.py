@@ -46,7 +46,7 @@ class global_path_pub:
         self.links = mgeo_planner_map.link_set.lines
 
         # 노드 패스를 설정한다
-        self.node_path = ['A119BS010184', 'A119BS010168', 'A119BS010754', 'A119BS010201', 'A119BS010184']
+        self.node_path = ['A119BS010184', 'A119BS010269', 'A119BS010148', 'A119BS010695']
 
         # 시작 노드와 끝 노드 사이의 최단 경로를 찾는다
         # 최단 경로를 찾아서 global_path_msg에 추가해 준다
