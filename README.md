@@ -7,7 +7,7 @@
 ### 개요
 
 - **I**ntersection **S**afety **D**rive **S**ystem
-(교차로 안전 운전 시스템)
+  (교차로 안전 운전 시스템)
 - **자율주행 환경**에서 교차로 내 **우회전** 시 **고도화된 상황대처 시스템**
 
 ### 타겟
@@ -37,87 +37,87 @@
 
 - 기본적인 자율주행 SW에 **ISDS** SW모듈이 탑재된 형태
 - **ISDS**
-    - 우회전 직전 정지선에서의 일시정지
-    - 우회전 시 신호등 확인 후 진입
-    - 우회전 시 보행자 감지 상황에서 일시정지
-    - 우회전 시 좌측에 직진 차량 대처
-    - 보행자의 급작스런 돌발행동 상황 대처 (갑자기 뛰어오는 어린이, 자전거 역주행, 무단횡단 등)
+  - 우회전 직전 정지선에서의 일시정지
+  - 우회전 시 신호등 확인 후 진입
+  - 우회전 시 보행자 감지 상황에서 일시정지
+  - 우회전 시 좌측에 직진 차량 대처
+  - 보행자의 급작스런 돌발행동 상황 대처 (갑자기 뛰어오는 어린이, 자전거 역주행, 무단횡단 등)
 
 ## IV. 기술
 
 - **공통**
-    - 개발언어 : Python 3.7
-    - Framework : ROS melodic 1.0
-    - Simulator : Morai Simulator
-    - 개발 환경 : Ubuntu
+  - 개발언어 : Python 3.7
+  - Framework : ROS melodic 1.0
+  - Simulator : Morai Simulator
+  - 개발 환경 : Ubuntu
 - **인지**
-    - LiDAR, Camera, GPS, IMU
-    - open CV
-    - Lane detection based Canny Edge & RANSAC Algorithm
-    - SFA3D (Super Fast Accurate 3D Object Detection based on 3D LiDAR Point Cloud )
-    - Yolo-X
+  - LiDAR, Camera, GPS, IMU
+  - open CV
+  - Lane detection based Canny Edge & RANSAC Algorithm
+  - SFA3D (Super Fast Accurate 3D Object Detection based on 3D LiDAR Point Cloud )
+  - Yolo-X
 - **판단**
 - **제어**
-    - Pure-Pursuit Algorithm
-    - PID control
-    - ACC (Adaptive Cruise Control)
+  - Pure-Pursuit Algorithm
+  - PID control
+  - ACC (Adaptive Cruise Control)
 
 ## VI. 협업 툴 및 협업 환경
 
 - **Notion**
-    - 기획 및 회의록 작성
-    - 산출물 기록 및 공유
+  - 기획 및 회의록 작성
+  - 산출물 기록 및 공유
 - **JIRA**
-    - 매주 목표량 설정하여 sprint 진행
-    - 업무 할당량 정하여 Story Point 설정, In Progress > Done 순으로 작성
+  - 매주 목표량 설정하여 sprint 진행
+  - 업무 할당량 정하여 Story Point 설정, In Progress > Done 순으로 작성
 - **GitLab**
-    - 코드 버전 관리
-    - 이슈 발행 및 관리
+  - 코드 버전 관리
+  - 이슈 발행 및 관리
 
 ## VII. 역할 분담
 
 - **인지**
-    - 이준혁 :
-        - SFA3D 모델을 이용한 3d object detection
-        - Motion Forecasting
-    - 차영후
-        - 차선 인식 알고리즘 설계 및 개선
-        - Yolo-X model 신호등 Dataset 학습 및 적용
-        - 인지 파트 SW설계
-        - 개발 및 최적화
+  - 이준혁 :
+    - mmdetection3d - Pointpillars모델을 이용한 3d object detection
+    - Camrea Lidar Sensor Fusion
+  - 차영후
+    - 차선 인식 알고리즘 설계 및 개선
+    - Yolo-X model 신호등 Dataset 학습 및 적용
+    - 인지 파트 SW설계
+    - 개발 및 최적화
 - **판단**
-    - 김호준 :
-        - Adaptive Cruise Control 전방 NPC 차량 인식 개선
-    - 장지웅 :
-        - 환경 설정
-        - 정지선 판단
+  - 김호준 :
+    - Adaptive Cruise Control 전방 NPC 차량 인식 개선
+  - 장지웅 :
+    - 환경 설정
+    - 정지선 판단
 - **제어**
-    - 김승기 :
-        - 종방향 제어
-    - 조은비 :
-        - 횡방향 제어
+  - 김승기 :
+    - 종방향 제어
+  - 조은비 :
+    - 횡방향 제어
 
 ## VIII. 프로젝트 결과물
 
 ※ 2023. 03. 24(4주차) 기준
 
 - **인지**
-    - **차선 인식 알고리즘을 개선**
-        
-        (기존 white-yellow color 검출 기반 ⇒ Canny Edge 기반)
-        
-    - **다양한 환경(악천후, 박명, 일몰, 야간 등)에서의 차선 검출 정확도 향상**
-        
-        (개선 전 대비 57% 향상 - Ground truth 데이터 기준으로 정확도 산출)
-        
-        ![Untitled](https://user-images.githubusercontent.com/57744586/227422714-305ae9b9-bfec-4785-acae-e0fc62f344bd.png)
-        
-    
-    - **ISDS개발**
-        - ISDS 인지 파트 플로우 (설계)
-        
-        ![Untitled 1](https://user-images.githubusercontent.com/57744586/227422751-13751cf4-4ded-4c5e-ba56-af9ed3c67db4.png)
-        
+
+  - **차선 인식 알고리즘을 개선**
+    (기존 white-yellow color 검출 기반 ⇒ Canny Edge 기반)
+  - **다양한 환경(악천후, 박명, 일몰, 야간 등)에서의 차선 검출 정확도 향상**
+
+    (개선 전 대비 57% 향상 - Ground truth 데이터 기준으로 정확도 산출)
+
+    ![Untitled](https://user-images.githubusercontent.com/57744586/227422714-305ae9b9-bfec-4785-acae-e0fc62f344bd.png)
+
+  - **Lidar 데이터를 이용한 3D Object Detection**
+    ![Image_BEV](./readme/BEV_Image.gif)
+    ![Image_Lidar](./readme/BEV_Lidar.gif)
+  - **ISDS개발**
+    - ISDS 인지 파트 플로우 (설계)
+      ![Untitled 1](https://user-images.githubusercontent.com/57744586/227422751-13751cf4-4ded-4c5e-ba56-af9ed3c67db4.png)
+
 - **판단**
 
 ![stoplane_not_in_route](https://user-images.githubusercontent.com/57744586/227422888-a81cf6ba-c0e2-4668-9c44-710ffed1e685.png)
@@ -126,19 +126,15 @@
 
 ![crosswalk](https://user-images.githubusercontent.com/57744586/227422936-8fe29cbd-37bd-49f4-8a87-2bf87c4dc14f.png)
 
-![Simulator-2023-03-24-10-53-13-_online-video-cutter.com_-_1_.gif](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/fce67bab-93ab-46ae-ad95-341fc8e9424e/Simulator-2023-03-24-10-53-13-_online-video-cutter.com_-_1_.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230324%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230324T042011Z&X-Amz-Expires=86400&X-Amz-Signature=f3c5c3e55d5dd427a039667db1614f8ce431ffd5b2160059ac65e115ba7c081d&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Simulator-2023-03-24-10-53-13-_online-video-cutter.com_-_1_.gif%22&x-id=GetObject)
+![정지선판단.gif](./readme/정지선판단.gif)
 
 - **제어**
-    - 종방향 제어
-        - 곡률에 따른 속도 제어 (가속, 감속 제어)
-            - 좌/우회전 시 최대 속도 100km/h 부터 감속 비교
-            
-            ![종방향제어before.gif](./readme/종방향제어before.gif)
-            
-            
-            ![종방향제어after.gif](./readme/종방향제어after.gif)
-            
-    - 횡방향 제어
+  - 종방향 제어
+    - 곡률에 따른 속도 제어 (가속, 감속 제어)
+      - 좌/우회전 시 최대 속도 100km/h 부터 감속 비교
+        ![종방향제어before.gif](./readme/종방향제어before.gif)
+        ![종방향제어after.gif](./readme/종방향제어after.gif)
+  - 횡방향 제어
 
 ## VIII. 서비스 데모 영상
 
