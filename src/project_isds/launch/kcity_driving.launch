@@ -3,7 +3,7 @@
     <node pkg="project_isds" type="gpsimu_parser.py" name="gpsimu_parser" />
     <node pkg="project_isds" type="global_path_pub.py" name="global_path"  />
     <node pkg="project_isds" type="local_path_pub_0_2.py" name="local_path_pub_0_2" />
-    <node pkg="project_isds" type="acc_copy.py" name="acc_copy" output="screen"/>
+    <node pkg="project_isds" type="acc_ctrl_pub.py" name="acc" output="screen"/>
     <node pkg="project_isds" type="ctrl_cmd_pub_2.py" name="ctrl_cmd_pub_2" output="screen" />
     <node pkg="project_isds" type="tf_pub.py" name="tf"  />
 
