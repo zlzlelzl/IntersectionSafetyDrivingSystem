@@ -54,7 +54,7 @@
   - LiDAR, Camera, GPS, IMU
   - open CV
   - Lane detection based Canny Edge & RANSAC Algorithm
-  - SFA3D (Super Fast Accurate 3D Object Detection based on 3D LiDAR Point Cloud )
+  - PointPillars
   - Yolo-X
 - **판단**
     - Dijkstra Algorithm
