@@ -57,10 +57,13 @@
   - SFA3D (Super Fast Accurate 3D Object Detection based on 3D LiDAR Point Cloud )
   - Yolo-X
 - **판단**
+    - Dijkstra Algorithm
+    - Acceleration by Curvature
+    - Velocity Map Caching (with File System)
 - **제어**
-  - Pure-Pursuit Algorithm
-  - PID control
-  - ACC (Adaptive Cruise Control)
+    - Pure-Pursuit Algorithm
+    - PID control
+    - ACC (Adaptive Cruise Control)
 
 ## VI. 협업 툴 및 협업 환경
 
@@ -85,21 +88,22 @@
     - Yolo-X model 신호등 Dataset 학습 및 적용
     - 인지 파트 SW설계
     - 개발 및 최적화
-- **판단**
-  - 김호준 :
-    - Adaptive Cruise Control 전방 NPC 차량 인식 개선
-  - 장지웅 :
-    - 환경 설정
-    - 정지선 판단
-- **제어**
-  - 김승기 :
-    - 종방향 제어
-  - 조은비 :
-    - 횡방향 제어
+- **판단 & 제어**
+    - 김호준(팀장) :
+        - Adaptive Cruise Control 전방 NPC 차량 인식 개선
+        - 신호에 따른 행동 설계
+    - 장지웅 :
+        - 환경 설정 및 시각화를 이용한 정보 공유 효율화
+        - 정지선 판단
+        - 곡률 기반 속도 리스트 파일 매핑
+    - 김승기 :
+        - 종방향 제어(곡률 기반 제어 및 인지 데이터 기반 제어)
+        - 신호에 따른 행동 설계 및 개발
+    - 조은비 :
+        - 횡방향 제어(PID 스티어링 적용)
+        - Dijkstra 개선(우선순위 큐 적용)
 
 ## VIII. 프로젝트 결과물
-
-※ 2023. 03. 24(4주차) 기준
 
 - **인지**
 
@@ -119,23 +123,47 @@
       ![Untitled 1](https://user-images.githubusercontent.com/57744586/227422751-13751cf4-4ded-4c5e-ba56-af9ed3c67db4.png)
 
 - **판단**
+    - **Mgeo, MatplotLib를 이용한 정지선 판단 시각화**
 
-![stoplane_not_in_route](https://user-images.githubusercontent.com/57744586/227422888-a81cf6ba-c0e2-4668-9c44-710ffed1e685.png)
+        ![stoplane_not_in_route](https://user-images.githubusercontent.com/57744586/227422888-a81cf6ba-c0e2-4668-9c44-710ffed1e685.png)
 
-![stoplane_in_route](https://user-images.githubusercontent.com/57744586/227422916-a4e65b4d-c9b5-47c4-bda3-61d9e5098ced.png)
+        ![stoplane_in_route](https://user-images.githubusercontent.com/57744586/227422916-a4e65b4d-c9b5-47c4-bda3-61d9e5098ced.png)
+    
+    - **횡단보도 시각화**
 
-![crosswalk](https://user-images.githubusercontent.com/57744586/227422936-8fe29cbd-37bd-49f4-8a87-2bf87c4dc14f.png)
-
-![정지선판단.gif](./readme/정지선판단.gif)
+        ![crosswalk](https://user-images.githubusercontent.com/57744586/227422936-8fe29cbd-37bd-49f4-8a87-2bf87c4dc14f.png)
+        
+    - **정지선 판단 후 제어**
+    
+    ![stoplane_control.gif](readme/stoplane_control.gif)
+    
+    - **곡률 기반 속도 리스트 파일 매핑**
+        
+        - 매핑 전
+        
+        ![매핑전.PNG](readme/매핑전.png)
+        
+        - 매핑 후
+        
+        ![매핑후.PNG](readme/매핑후.png)
+        
+    - **Dijkstra 개선**
+        
+        ![dijkstra개선](readme/dijkstra개선.png)
 
 - **제어**
-  - 종방향 제어
-    - 곡률에 따른 속도 제어 (가속, 감속 제어)
-      - 좌/우회전 시 최대 속도 100km/h 부터 감속 비교
-        ![종방향제어before.gif](./readme/종방향제어before.gif)
-        ![종방향제어after.gif](./readme/종방향제어after.gif)
-  - 횡방향 제어
-
-## VIII. 서비스 데모 영상
-
-- **Demo Video**
+   - **곡률에 따른 속도 제어** (가속, 감속 제어)
+        - 좌/우회전 시 최대 속도 100km/h 부터 감속 비교
+        
+        ![종방향제어before.gif](readme/종방향제어before.gif)
+        
+        ![종방향제어after.gif](readme/종방향제어after.gif)
+        
+    - **인지 데이터 기반 제어**
+        
+        ![신호인지및제어.gif](readme/신호인지및제어.gif)
+        
+    
+    - **곡률 기반 속도 개선** ( 예견 거리 계획 → 곡률 반경 기반 주행 목표점 계획, 곡률 기반 목표 속도 계획 )
+    
+        ![pid_and_curvature.gif](readme/pid_and_curvature.gif)
