@@ -2,19 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import rospy
-import rospkg
 import sys
 import os
-import copy
-import numpy as np
-import json
 
-from math import cos, sin, sqrt, pow, atan2, pi
 import heapq
 from std_msgs.msg import Int16
-from geometry_msgs.msg import Point32, PoseStamped
-from nav_msgs.msg import Odometry, Path
-from collections import deque
+from geometry_msgs.msg import PoseStamped
+from nav_msgs.msg import Path
 
 # 현재 파일 경로와 시스템 경로를 추가해 준다
 current_path = os.path.dirname(os.path.realpath(__file__))

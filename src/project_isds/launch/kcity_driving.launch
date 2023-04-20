@@ -1,31 +1,12 @@
 <launch>
-<<<<<<< HEAD
-    <node pkg="ssafy_2" type="mgeo_pub.py" name="mgeo_pub"  />
-    <node pkg="ssafy_2" type="gpsimu_parser.py" name="gpsimu_parser" />
-
-    <node pkg="ssafy_2" type="mgeo_dijkstra_path_0_1.py" name="mgeo_dijkstra_path"  />
-
-    <node pkg="ssafy_2" type="local_path_pub_0_3.py" name="local_path_pub_0_3" />
-    <node pkg="ssafy_2" type="acc_copy.py" name="acc_copy"/>
-
-    <node pkg="ssafy_2" type="ctrl_cmd_pub_2.py" name="ctrl_cmd_pub_2"  />
-    <!-- <node pkg="ssafy_2" type="local_path_pub_0_1.py" name="local_path_pub_0_1" output="screen" /> -->
-
-    <node pkg="ssafy_2" type="traffic_light_pub.py" name="traffic_light_pub" />
-    <node pkg="ssafy_2" type="intersection_decision.py" name="intersection_decision"  />
-    <node pkg="ssafy_2" type="tf_pub.py" name="tf"  />
-
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ssafy_2)/rviz/kcity_rviz.rviz" />
-</launch>
-=======
     <node pkg="project_isds" type="mgeo_pub.py" name="mgeo_pub"  />
     <node pkg="project_isds" type="gpsimu_parser.py" name="gpsimu_parser" />
     <node pkg="project_isds" type="global_path_pub.py" name="global_path"  />
-    <node pkg="project_isds" type="local_path_pub_0_2.py" name="local_path_pub_0_2" />
-    <node pkg="project_isds" type="acc_ctrl_pub.py" name="acc" output="screen"/>
-    <node pkg="project_isds" type="ctrl_cmd_pub_2.py" name="ctrl_cmd_pub_2" output="screen" />
+    <node pkg="project_isds" type="local_path_pub.py" name="local_path_pub" />
+    <node pkg="project_isds" type="acc_ctrl_pub.py" name="acc" />
+    <node pkg="project_isds" type="ctrl_cmd_pub.py" name="ctrl_cmd_pub" />
+    <node pkg="ssafy_2" type="traffic_light_pub.py" name="traffic_light_pub" />
+    <node pkg="ssafy_2" type="intersection_decision.py" name="intersection_decision"  />
     <node pkg="project_isds" type="tf_pub.py" name="tf"  />
-
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find project_isds)/rviz/kcity_rviz.rviz" />
 </launch>
->>>>>>> 5c3aa4a11aebf459e26efd9f218904c9b72fd1ac

@@ -2,13 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import rospy
-import rospkg
 from std_msgs.msg import Float32
 from nav_msgs.msg import Path, Odometry
-from morai_msgs.msg import EgoVehicleStatus, ObjectStatusList, CtrlCmd
+from morai_msgs.msg import EgoVehicleStatus, ObjectStatusList
 
 import numpy as np
-import tf
 from tf.transformations import euler_from_quaternion
 
 class AccCtrlPub:

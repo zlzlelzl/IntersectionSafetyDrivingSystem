@@ -116,8 +116,8 @@
     ![Untitled](https://user-images.githubusercontent.com/57744586/227422714-305ae9b9-bfec-4785-acae-e0fc62f344bd.png)
 
   - **Lidar 데이터를 이용한 3D Object Detection**
-    ![Image_BEV](./readme/BEV_Image.gif)
-    ![Image_Lidar](./readme/BEV_Lidar.gif)
+    ![Image_BEV](./readme_src/BEV_Image.gif)
+    ![Image_Lidar](./readme_src/BEV_Lidar.gif)
   - **ISDS개발**
     - ISDS 인지 파트 플로우 (설계)
       ![Untitled 1](https://user-images.githubusercontent.com/57744586/227422751-13751cf4-4ded-4c5e-ba56-af9ed3c67db4.png)
@@ -135,35 +135,35 @@
         
     - **정지선 판단 후 제어**
     
-    ![stoplane_control.gif](readme/stoplane_control.gif)
+    ![stoplane_control.gif](readme_src/stoplane_control.gif)
     
     - **곡률 기반 속도 리스트 파일 매핑**
         
         - 매핑 전
         
-        ![매핑전.PNG](readme/매핑전.png)
+        ![매핑전.PNG](readme_src/매핑전.png)
         
         - 매핑 후
         
-        ![매핑후.PNG](readme/매핑후.png)
+        ![매핑후.PNG](readme_src/매핑후.png)
         
     - **Dijkstra 개선**
         
-        ![dijkstra개선](readme/dijkstra개선.png)
+        ![dijkstra개선](readme_src/dijkstra개선.png)
 
 - **제어**
    - **곡률에 따른 속도 제어** (가속, 감속 제어)
         - 좌/우회전 시 최대 속도 100km/h 부터 감속 비교
         
-        ![종방향제어before.gif](readme/종방향제어before.gif)
+        ![종방향제어before.gif](readme_src/종방향제어before.gif)
         
-        ![종방향제어after.gif](readme/종방향제어after.gif)
+        ![종방향제어after.gif](readme_src/종방향제어after.gif)
         
     - **인지 데이터 기반 제어**
         
-        ![신호인지및제어.gif](readme/신호인지및제어.gif)
+        ![신호인지및제어.gif](readme_src/신호인지및제어.gif)
         
     
     - **곡률 기반 속도 개선** ( 예견 거리 계획 → 곡률 반경 기반 주행 목표점 계획, 곡률 기반 목표 속도 계획 )
     
-        ![pid_and_curvature.gif](readme/pid_and_curvature.gif)
+        ![pid_and_curvature.gif](readme_src/pid_and_curvature.gif)

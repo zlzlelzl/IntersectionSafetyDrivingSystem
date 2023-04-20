@@ -98,10 +98,6 @@ def main():
     args = parser.parse_args()
     
     pcd_paths = [args.pcd]
-    # for i in range(356):
-    #     pcd_path = 'data/custom/velo/{:0>6}.bin'.format(i)
-    #     pcd_paths.append(pcd_path)
-    # build the model from a config file and a checkpoint file
     
     for pcd_path in pcd_paths:
         model = init_model(args.config, args.checkpoint, device=args.device)

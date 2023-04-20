@@ -1,8 +1,0 @@
-prefix=/home/kimsngi/project_ws/devel
-
-Name: project_isds
-Description: Description of project_isds
-Version: 0.0.0
-Cflags: -I/home/kimsngi/project_ws/devel/include
-Libs: -L${prefix}/lib 
-Requires: message_runtime
